@@ -1,13 +1,30 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Vendor;
+import com.example.demo.repository.VendorRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
-public interface VendorService {
+@Service   
+public class VendorService {
 
-    Vendor createVendor(Vendor vendor);
+    private final VendorRepository vendorRepository;
 
-    Vendor getVendor(Long id);
+    // ✅ Constructor Injection (matches test constraints)
+    public VendorService(VendorRepository vendorRepository) {
+        this.vendorRepository = vendorRepository;
+    }
 
-    List<Vendor> getAllVendors();
+    public Vendor createVendor(Vendor vendor) {
+        return vendorRepository.save(vendor);
+    }
+
+    public Vendor getVendor(Long id) {
+        return vendorRepository.findById(id).orElse(null);
+    }
+
+    public List<Vendor> getAllVendors() {
+        return vendorRepository.findAll();
+    }
 }

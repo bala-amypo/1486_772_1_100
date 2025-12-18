@@ -1,13 +1,5 @@
-package com.example.demo.controller;
-
-import com.example.demo.model.Vendor;
-import com.example.demo.service.VendorService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 @RestController
-@RequestMapping("/vendors")
+@RequestMapping("/api/vendors")
 public class VendorController {
 
     private final VendorService vendorService;
@@ -17,17 +9,17 @@ public class VendorController {
     }
 
     @PostMapping
-    public Vendor createVendor(@RequestBody Vendor vendor) {
+    public Vendor create(@RequestBody Vendor vendor) {
         return vendorService.createVendor(vendor);
     }
 
-    @GetMapping("/{id}")
-    public Vendor getVendor(@PathVariable Long id) {
-        return vendorService.getVendor(id);
+    @GetMapping
+    public List<Vendor> getAll() {
+        return vendorService.getAllVendors();
     }
 
-    @GetMapping
-    public List<Vendor> getAllVendors() {
-        return vendorService.getAllVendors();
+    @GetMapping("/{id}")
+    public Vendor get(@PathVariable Long id) {
+        return vendorService.getVendor(id);
     }
 }
