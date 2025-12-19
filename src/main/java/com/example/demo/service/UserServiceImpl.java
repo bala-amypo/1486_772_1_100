@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.exception.ValidationException;
+import com.example.demo.exceptionhandler.ResourceNotFoundException;
+import com.example.demo.exceptionhandler.ValidationException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
