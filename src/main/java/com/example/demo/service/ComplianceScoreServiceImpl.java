@@ -6,6 +6,8 @@ import com.example.demo.repository.ComplianceScoreRepository;
 import com.example.demo.repository.VendorRepository;
 import com.example.demo.repository.VendorDocumentRepository;
 import com.example.demo.repository.ComplianceRuleRepository;
+import com.example.demo.exceptionhandler.ResourceNotFoundException;
+import com.example.demo.exceptionhandler.ValidationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,19 +35,28 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
     @Override
     public ComplianceScore evaluateVendor(Long vendorId) {
 
-        Vendor vendor = vendorRepository.findById(vendorId).orElse(null);
-        if (vendor == null) {
-            return null; // or throw exception later
-        }
+        // ✅ Vendor must exist
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Vendor not found"));
 
-        // If score already exists → update
+        // Existing score or new one
         ComplianceScore score = complianceScoreRepository
                 .findByVendor_Id(vendorId)
                 .orElse(new ComplianceScore());
 
         score.setVendor(vendor);
-        score.setScoreValue(100.0);      // placeholder logic
-        score.setRating("EXCELLENT");    // placeholder logic
+
+        // Placeholder calculation
+        double calculatedScore = 100.0;
+
+        // ✅ Validation rule
+        if (calculatedScore < 0) {
+            throw new ValidationException("Compliance score cannot be negative");
+        }
+
+        score.setScoreValue(calculatedScore);
+        score.setRating("EXCELLENT");
         score.setLastEvaluated(LocalDateTime.now());
 
         return complianceScoreRepository.save(score);
@@ -53,7 +64,9 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
 
     @Override
     public ComplianceScore getScore(Long vendorId) {
-        return complianceScoreRepository.findByVendor_Id(vendorId).orElse(null);
+        return complianceScoreRepository.findByVendor_Id(vendorId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Vendor not found"));
     }
 
     @Override
