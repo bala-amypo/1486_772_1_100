@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.model.Vendor;
 import com.example.demo.repository.VendorRepository;
 import com.example.demo.exceptionhandler.ValidationException;
+import com.example.demo.exceptionhandler.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +13,6 @@ public class VendorServiceImpl implements VendorService {
 
     private final VendorRepository vendorRepository;
 
-    // ✅ Constructor injection
     public VendorServiceImpl(VendorRepository vendorRepository) {
         this.vendorRepository = vendorRepository;
     }
@@ -20,7 +20,6 @@ public class VendorServiceImpl implements VendorService {
     @Override
     public Vendor createVendor(Vendor vendor) {
 
-        // ✅ PUT IT HERE
         if (vendorRepository.existsByVendorName(vendor.getVendorName())) {
             throw new ValidationException("Vendor name already exists");
         }
@@ -30,7 +29,9 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     public Vendor getVendor(Long id) {
-        return vendorRepository.findById(id).orElse(null);
+        return vendorRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Vendor not found"));
     }
 
     @Override
