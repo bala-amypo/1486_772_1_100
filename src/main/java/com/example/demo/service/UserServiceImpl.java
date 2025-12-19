@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.exceptionhandler.ValidationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,14 +10,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    // ✅ Constructor injection (matches test constraints)
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public User register(User user) {
-        // ❌ No encoding
+
+        // ✅ PUT IT HERE (business validation)
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new ValidationException("Email already in use");
+        }
+
         return userRepository.save(user);
     }
 
