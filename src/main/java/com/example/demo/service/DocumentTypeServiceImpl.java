@@ -2,11 +2,12 @@ package com.example.demo.service;
 
 import com.example.demo.model.DocumentType;
 import com.example.demo.repository.DocumentTypeRepository;
+import com.example.demo.exceptionhandler.ValidationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service   // ✅ THIS IS REQUIRED
+@Service
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     private final DocumentTypeRepository documentTypeRepository;
@@ -17,6 +18,12 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     public DocumentType createDocumentType(DocumentType type) {
+
+        // ✅ DUPLICATE CHECK GOES HERE
+        if (documentTypeRepository.existsByTypeName(type.getTypeName())) {
+            throw new ValidationException("Document Type already exists");
+        }
+
         return documentTypeRepository.save(type);
     }
 
