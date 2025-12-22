@@ -19,7 +19,7 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     public DocumentType createDocumentType(DocumentType type) {
 
-        // ✅ DUPLICATE CHECK GOES HERE
+    
         if (documentTypeRepository.existsByTypeName(type.getTypeName())) {
             throw new ValidationException("Document Type already exists");
         }

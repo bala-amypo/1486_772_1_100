@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User register(User user) {
 
-        // ✅ PUT IT HERE (business validation)
+        
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new ValidationException("Email already in use");
         }
