@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service   // ✅ REQUIRED
+@Service  
 public class ComplianceRuleServiceImpl implements ComplianceRuleService {
 
     private final ComplianceRuleRepository complianceRuleRepository;

@@ -35,22 +35,21 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
     @Override
     public ComplianceScore evaluateVendor(Long vendorId) {
 
-        // ✅ Vendor must exist
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Vendor not found"));
 
-        // Existing score or new one
+        
         ComplianceScore score = complianceScoreRepository
                 .findByVendor_Id(vendorId)
                 .orElse(new ComplianceScore());
 
         score.setVendor(vendor);
 
-        // Placeholder calculation
+    
         double calculatedScore = 100.0;
 
-        // ✅ Validation rule
+
         if (calculatedScore < 0) {
             throw new ValidationException("Compliance score cannot be negative");
         }
