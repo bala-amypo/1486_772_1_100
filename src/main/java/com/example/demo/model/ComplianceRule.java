@@ -4,47 +4,86 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "compliance_rules", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "ruleName")
-})
+@Table(name = "compliance_rules",
+       uniqueConstraints = @UniqueConstraint(columnNames = "ruleName"))
 public class ComplianceRule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String ruleName;
 
     private String ruleDescription;
 
-    private String matchType; // EXPIRY_CHECK / DOCUMENT_REQUIRED / WEIGHTED_SCORE
+    private String matchType;
 
-    @Column(nullable = false)
     private Double threshold;
 
     private LocalDateTime createdAt;
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+    public ComplianceRule() {
     }
 
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public ComplianceRule(String ruleName, String ruleDescription, String matchType, Double threshold) {
+        this.ruleName = ruleName;
+        this.ruleDescription = ruleDescription;
+        this.matchType = matchType;
+        this.threshold = threshold;
+    }
 
-    public String getRuleName() { return ruleName; }
-    public void setRuleName(String ruleName) { this.ruleName = ruleName; }
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        if (this.threshold == null) {
+            this.threshold = 0.0;
+        }
+    }
 
-    public String getRuleDescription() { return ruleDescription; }
-    public void setRuleDescription(String ruleDescription) { this.ruleDescription = ruleDescription; }
+    // Getters and Setters
 
-    public String getMatchType() { return matchType; }
-    public void setMatchType(String matchType) { this.matchType = matchType; }
+    public Long getId() {
+        return id;
+    }
 
-    public Double getThreshold() { return threshold; }
-    public void setThreshold(Double threshold) { this.threshold = threshold; }
+    public String getRuleName() {
+        return ruleName;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getRuleDescription() {
+        return ruleDescription;
+    }
+
+    public String getMatchType() {
+        return matchType;
+    }
+
+    public Double getThreshold() {
+        return threshold;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public void setRuleDescription(String ruleDescription) {
+        this.ruleDescription = ruleDescription;
+    }
+
+    public void setMatchType(String matchType) {
+        this.matchType = matchType;
+    }
+
+    public void setThreshold(Double threshold) {
+        this.threshold = threshold;
+    }
 }
