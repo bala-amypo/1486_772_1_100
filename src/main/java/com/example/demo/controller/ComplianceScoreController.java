@@ -16,18 +16,18 @@ public class ComplianceScoreController {
         this.complianceScoreService = complianceScoreService;
     }
 
-    @PostMapping("/evaluate/{vendorId}")
-    public ComplianceScore evaluateVendor(@PathVariable Long vendorId) {
+    @PostMapping("/evaluate")
+    public ComplianceScore evaluate(@RequestParam Long vendorId) {
         return complianceScoreService.evaluateVendor(vendorId);
     }
 
-    @GetMapping("/{vendorId}")
-    public ComplianceScore getScore(@PathVariable Long vendorId) {
+    @GetMapping("/vendor/{vendorId}")
+    public ComplianceScore getByVendor(@PathVariable Long vendorId) {
         return complianceScoreService.getScore(vendorId);
     }
 
     @GetMapping
-    public List<ComplianceScore> getAllScores() {
+    public List<ComplianceScore> getAll() {
         return complianceScoreService.getAllScores();
     }
 }
