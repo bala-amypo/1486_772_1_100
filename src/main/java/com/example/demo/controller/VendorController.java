@@ -1,37 +1,33 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.VendorDocument;
-import com.example.demo.service.VendorDocumentService;
+import com.example.demo.model.Vendor;
+import com.example.demo.service.VendorService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/vendor-documents")
-public class VendorDocumentController {
+@RequestMapping("/api/vendors")
+public class VendorController {
 
-    private final VendorDocumentService vendorDocumentService;
+    private final VendorService vendorService;
 
-    public VendorDocumentController(VendorDocumentService vendorDocumentService) {
-        this.vendorDocumentService = vendorDocumentService;
+    public VendorController(VendorService vendorService) {
+        this.vendorService = vendorService;
     }
 
     @PostMapping
-    public VendorDocument upload(
-            @RequestParam Long vendorId,
-            @RequestParam Long typeId,
-            @RequestBody VendorDocument document) {
-
-        return vendorDocumentService.uploadDocument(vendorId, typeId, document);
+    public Vendor create(@RequestBody Vendor vendor) {
+        return vendorService.createVendor(vendor);
     }
 
-    @GetMapping("/vendor/{vendorId}")
-    public List<VendorDocument> getForVendor(@PathVariable Long vendorId) {
-        return vendorDocumentService.getDocumentsForVendor(vendorId);
+    @GetMapping
+    public List<Vendor> getAll() {
+        return vendorService.getAllVendors();
     }
 
     @GetMapping("/{id}")
-    public VendorDocument getById(@PathVariable Long id) {
-        return vendorDocumentService.getDocument(id);
+    public Vendor getById(@PathVariable Long id) {
+        return vendorService.getVendor(id);
     }
 }
