@@ -27,7 +27,7 @@ public class VendorController {
     }
 
     @GetMapping("/{id}")
-    public Vendor get(@PathVariable Long id) {
+    public Vendor getById(@PathVariable Long id) {
         return vendorService.getVendor(id);
     }
 }
