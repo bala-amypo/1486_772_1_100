@@ -29,36 +29,81 @@ public class VendorDocument {
 
     private Boolean isValid;
 
-    @PrePersist
-    public void prePersist() {
-        this.uploadedAt = LocalDateTime.now();
+    public VendorDocument() {
+    }
 
-        // ✅ REQUIRED BY SPEC & TESTS
-        if (expiryDate == null || expiryDate.isAfter(LocalDate.now())) {
+    public VendorDocument(Vendor vendor, DocumentType documentType, String fileUrl, LocalDate expiryDate) {
+        this.vendor = vendor;
+        this.documentType = documentType;
+        this.fileUrl = fileUrl;
+        this.expiryDate = expiryDate;
+    }
+
+    @PrePersist
+    protected void onUpload() {
+        this.uploadedAt = LocalDateTime.now();
+        if (this.expiryDate == null || this.expiryDate.isAfter(LocalDate.now())) {
             this.isValid = true;
         } else {
             this.isValid = false;
         }
     }
 
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // Getters and Setters
 
-    public Vendor getVendor() { return vendor; }
-    public void setVendor(Vendor vendor) { this.vendor = vendor; }
+    public Long getId() {
+        return id;
+    }
 
-    public DocumentType getDocumentType() { return documentType; }
-    public void setDocumentType(DocumentType documentType) { this.documentType = documentType; }
+    public Vendor getVendor() {
+        return vendor;
+    }
 
-    public String getFileUrl() { return fileUrl; }
-    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+    public DocumentType getDocumentType() {
+        return documentType;
+    }
 
-    public LocalDateTime getUploadedAt() { return uploadedAt; }
+    public String getFileUrl() {
+        return fileUrl;
+    }
 
-    public LocalDate getExpiryDate() { return expiryDate; }
-    public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
+    }
 
-    public Boolean getIsValid() { return isValid; }
-    public void setIsValid(Boolean isValid) { this.isValid = isValid; }
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
+    }
+
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public void setIsValid(Boolean valid) {
+        isValid = valid;
+    }
 }
