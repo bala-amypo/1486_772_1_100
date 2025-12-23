@@ -1,13 +1,16 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ValidationException;
 import com.example.demo.model.ComplianceScore;
+import com.example.demo.model.DocumentType;
 import com.example.demo.model.Vendor;
+import com.example.demo.model.VendorDocument;
 import com.example.demo.repository.ComplianceScoreRepository;
-import com.example.demo.repository.VendorRepository;
+import com.example.demo.repository.DocumentTypeRepository;
 import com.example.demo.repository.VendorDocumentRepository;
-import com.example.demo.repository.ComplianceRuleRepository;
-import com.example.demo.exceptionhandler.ResourceNotFoundException;
-import com.example.demo.exceptionhandler.ValidationException;
+import com.example.demo.repository.VendorRepository;
+import com.example.demo.util.ComplianceScoringEngine;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,56 +19,55 @@ import java.util.List;
 @Service
 public class ComplianceScoreServiceImpl implements ComplianceScoreService {
 
-    private final ComplianceScoreRepository complianceScoreRepository;
     private final VendorRepository vendorRepository;
+    private final DocumentTypeRepository documentTypeRepository;
     private final VendorDocumentRepository vendorDocumentRepository;
-    private final ComplianceRuleRepository complianceRuleRepository;
+    private final ComplianceScoreRepository complianceScoreRepository;
 
     public ComplianceScoreServiceImpl(
-            ComplianceScoreRepository complianceScoreRepository,
             VendorRepository vendorRepository,
+            DocumentTypeRepository documentTypeRepository,
             VendorDocumentRepository vendorDocumentRepository,
-            ComplianceRuleRepository complianceRuleRepository) {
-        this.complianceScoreRepository = complianceScoreRepository;
+            ComplianceScoreRepository complianceScoreRepository) {
+
         this.vendorRepository = vendorRepository;
+        this.documentTypeRepository = documentTypeRepository;
         this.vendorDocumentRepository = vendorDocumentRepository;
-        this.complianceRuleRepository = complianceRuleRepository;
+        this.complianceScoreRepository = complianceScoreRepository;
     }
 
     @Override
     public ComplianceScore evaluateVendor(Long vendorId) {
 
         Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Vendor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
 
-        
-        ComplianceScore score = complianceScoreRepository
-                .findByVendor_Id(vendorId)
-                .orElse(new ComplianceScore());
+        List<DocumentType> requiredTypes = documentTypeRepository.findByRequiredTrue();
+        List<VendorDocument> vendorDocuments =
+                vendorDocumentRepository.findByVendor(vendor);
 
-        score.setVendor(vendor);
+        double score = ComplianceScoringEngine.calculateScore(requiredTypes, vendorDocuments);
 
-    
-        double calculatedScore = 100.0;
-
-
-        if (calculatedScore < 0) {
+        if (score < 0) {
             throw new ValidationException("Compliance score cannot be negative");
         }
 
-        score.setScoreValue(calculatedScore);
-        score.setRating("EXCELLENT");
-        score.setLastEvaluated(LocalDateTime.now());
+        ComplianceScore complianceScore = complianceScoreRepository
+                .findByVendorId(vendorId)
+                .orElse(new ComplianceScore());
 
-        return complianceScoreRepository.save(score);
+        complianceScore.setVendor(vendor);
+        complianceScore.setScoreValue(score);
+        complianceScore.setRating(ComplianceScoringEngine.deriveRating(score));
+        complianceScore.setLastEvaluated(LocalDateTime.now());
+
+        return complianceScoreRepository.save(complianceScore);
     }
 
     @Override
     public ComplianceScore getScore(Long vendorId) {
-        return complianceScoreRepository.findByVendor_Id(vendorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Vendor not found"));
+        return complianceScoreRepository.findByVendorId(vendorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Score not found"));
     }
 
     @Override
