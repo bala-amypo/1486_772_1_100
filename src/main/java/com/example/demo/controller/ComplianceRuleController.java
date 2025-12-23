@@ -17,17 +17,17 @@ public class ComplianceRuleController {
     }
 
     @PostMapping
-    public ComplianceRule createRule(@RequestBody ComplianceRule rule) {
+    public ComplianceRule create(@RequestBody ComplianceRule rule) {
         return complianceRuleService.createRule(rule);
     }
 
-    @GetMapping("/{id}")
-    public ComplianceRule getRule(@PathVariable Long id) {
-        return complianceRuleService.getRule(id);
+    @GetMapping
+    public List<ComplianceRule> getAll() {
+        return complianceRuleService.getAllRules();
     }
 
-    @GetMapping
-    public List<ComplianceRule> getAllRules() {
-        return complianceRuleService.getAllRules();
+    @GetMapping("/{id}")
+    public ComplianceRule getById(@PathVariable Long id) {
+        return complianceRuleService.getRule(id);
     }
 }
