@@ -1,8 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ValidationException;
 import com.example.demo.model.DocumentType;
 import com.example.demo.repository.DocumentTypeRepository;
-import com.example.demo.exceptionhandler.ValidationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,21 +20,26 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     public DocumentType createDocumentType(DocumentType type) {
 
-    
         if (documentTypeRepository.existsByTypeName(type.getTypeName())) {
-            throw new ValidationException("Document Type already exists");
+            throw new ValidationException("Duplicate document type");
+        }
+
+        if (type.getWeight() != null && type.getWeight() < 0) {
+            throw new ValidationException("Weight cannot be negative");
         }
 
         return documentTypeRepository.save(type);
     }
 
     @Override
-    public DocumentType getDocumentType(Long id) {
-        return documentTypeRepository.findById(id).orElse(null);
+    public List<DocumentType> getAllDocumentTypes() {
+        return documentTypeRepository.findAll();
     }
 
     @Override
-    public List<DocumentType> getAllDocumentTypes() {
-        return documentTypeRepository.findAll();
+    public DocumentType getDocumentType(Long id) {
+        return documentTypeRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("DocumentType not found"));
     }
 }
