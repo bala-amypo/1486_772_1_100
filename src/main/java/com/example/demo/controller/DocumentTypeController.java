@@ -2,14 +2,12 @@ package com.example.demo.controller;
 
 import com.example.demo.model.DocumentType;
 import com.example.demo.service.DocumentTypeService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/document-types")
-@Tag(name = "Document Types")
 public class DocumentTypeController {
 
     private final DocumentTypeService documentTypeService;
@@ -29,7 +27,7 @@ public class DocumentTypeController {
     }
 
     @GetMapping("/{id}")
-    public DocumentType get(@PathVariable Long id) {
+    public DocumentType getById(@PathVariable Long id) {
         return documentTypeService.getDocumentType(id);
     }
 }
