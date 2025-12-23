@@ -17,23 +17,58 @@ public class ComplianceScore {
 
     private Double scoreValue;
 
-    private String rating; // EXCELLENT / GOOD / POOR / NON_COMPLIANT
-
     private LocalDateTime lastEvaluated;
 
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    private String rating;
 
-    public Vendor getVendor() { return vendor; }
-    public void setVendor(Vendor vendor) { this.vendor = vendor; }
+    public ComplianceScore() {
+    }
 
-    public Double getScoreValue() { return scoreValue; }
-    public void setScoreValue(Double scoreValue) { this.scoreValue = scoreValue; }
+    public ComplianceScore(Vendor vendor, Double scoreValue, String rating) {
+        this.vendor = vendor;
+        this.scoreValue = scoreValue;
+        this.rating = rating;
+    }
 
-    public String getRating() { return rating; }
-    public void setRating(String rating) { this.rating = rating; }
+    // Getters and Setters
 
-    public LocalDateTime getLastEvaluated() { return lastEvaluated; }
-    public void setLastEvaluated(LocalDateTime lastEvaluated) { this.lastEvaluated = lastEvaluated; }
+    public Long getId() {
+        return id;
+    }
+
+    public Vendor getVendor() {
+        return vendor;
+    }
+
+    public Double getScoreValue() {
+        return scoreValue;
+    }
+
+    public LocalDateTime getLastEvaluated() {
+        return lastEvaluated;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
+    }
+
+    public void setScoreValue(Double scoreValue) {
+        this.scoreValue = scoreValue;
+    }
+
+    public void setLastEvaluated(LocalDateTime lastEvaluated) {
+        this.lastEvaluated = lastEvaluated;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
 }
