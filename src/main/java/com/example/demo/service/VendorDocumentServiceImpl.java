@@ -20,9 +20,11 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
     private final VendorRepository vendorRepository;
     private final DocumentTypeRepository documentTypeRepository;
 
-    public VendorDocumentServiceImpl(VendorDocumentRepository vendorDocumentRepository,
-                                     VendorRepository vendorRepository,
-                                     DocumentTypeRepository documentTypeRepository) {
+    public VendorDocumentServiceImpl(
+            VendorDocumentRepository vendorDocumentRepository,
+            VendorRepository vendorRepository,
+            DocumentTypeRepository documentTypeRepository) {
+
         this.vendorDocumentRepository = vendorDocumentRepository;
         this.vendorRepository = vendorRepository;
         this.documentTypeRepository = documentTypeRepository;
@@ -32,14 +34,12 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
     public VendorDocument uploadDocument(Long vendorId, Long typeId, VendorDocument document) {
 
         Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Vendor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
 
         DocumentType type = documentTypeRepository.findById(typeId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("DocumentType not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("DocumentType not found"));
 
-        if (document.getFileUrl() == null || document.getFileUrl().isEmpty()) {
+        if (document.getFileUrl() == null || document.getFileUrl().isBlank()) {
             throw new ValidationException("File URL is required");
         }
 
@@ -50,6 +50,10 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
 
         document.setVendor(vendor);
         document.setDocumentType(type);
+        document.setIsValid(
+                document.getExpiryDate() == null ||
+                document.getExpiryDate().isAfter(LocalDate.now())
+        );
 
         return vendorDocumentRepository.save(document);
     }
@@ -58,8 +62,7 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
     public List<VendorDocument> getDocumentsForVendor(Long vendorId) {
 
         Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Vendor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
 
         return vendorDocumentRepository.findByVendor(vendor);
     }
@@ -67,7 +70,6 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
     @Override
     public VendorDocument getDocument(Long id) {
         return vendorDocumentRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("VendorDocument not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("VendorDocument not found"));
     }
 }
