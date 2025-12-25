@@ -6,21 +6,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "document_types",
-       uniqueConstraints = @UniqueConstraint(columnNames = "typeName"))
+@Table(
+        name = "document_types",
+        uniqueConstraints = @UniqueConstraint(columnNames = "type_name")
+)
 public class DocumentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "type_name", nullable = false, unique = true)
     private String typeName;
 
     private String description;
 
+    @Column(nullable = false)
     private Boolean required;
 
+    @Column(nullable = false)
     private Integer weight;
 
     private LocalDateTime createdAt;
@@ -39,37 +43,40 @@ public class DocumentType {
     }
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.weight == null) {
+
+        if (this.required == null) {
+            this.required = false;
+        }
+
+        if (this.weight == null || this.weight < 0) {
             this.weight = 0;
         }
     }
 
-    // Getters and Setters
-
     public Long getId() {
         return id;
-    }
-
-    public String getTypeName() {
-        return typeName;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public Set<Vendor> getVendors() {
-        return vendors;
-    }
-
-    public void setVendors(Set<Vendor> vendors) {
-        this.vendors = vendors;
+    public String getTypeName() {
+        return typeName;
     }
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Boolean getRequired() {
@@ -84,19 +91,19 @@ public class DocumentType {
         return weight;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public void setWeight(Integer weight) {
         this.weight = weight;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Set<Vendor> getVendors() {
+        return vendors;
+    }
+
+    public void setVendors(Set<Vendor> vendors) {
+        this.vendors = vendors;
     }
 }
