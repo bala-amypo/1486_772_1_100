@@ -13,7 +13,7 @@ import com.example.demo.service.ComplianceScoreService;
 import com.example.demo.util.ComplianceScoringEngine;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,10 +42,10 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
 
-        List<DocumentType> documentTypes = documentTypeRepository.findAll();
-        List<VendorDocument> documents = vendorDocumentRepository.findByVendorId(vendorId);
+        List<DocumentType> documentTypes = documentTypeRepository.findByRequiredTrue();
+        List<VendorDocument> documents = vendorDocumentRepository.findByVendor(vendor);
 
-        // 🔥 CORRECT ORDER
+        // ✅ CORRECT PARAMETER ORDER
         double score = ComplianceScoringEngine.calculateScore(documentTypes, documents);
 
         ComplianceScore complianceScore = complianceScoreRepository
@@ -53,9 +53,9 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
                 .orElse(new ComplianceScore());
 
         complianceScore.setVendor(vendor);
-        complianceScore.setScore(score); // 🔥 FIXED
+        complianceScore.setScoreValue(score);
         complianceScore.setRating(ComplianceScoringEngine.deriveRating(score));
-        complianceScore.setEvaluatedAt(LocalDate.now()); // 🔥 FIXED
+        complianceScore.setLastEvaluated(LocalDateTime.now());
 
         return complianceScoreRepository.save(complianceScore);
     }
