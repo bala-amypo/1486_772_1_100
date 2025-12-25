@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ValidationException;
 import com.example.demo.model.ComplianceScore;
 import com.example.demo.model.DocumentType;
 import com.example.demo.model.Vendor;
@@ -42,15 +43,24 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"));
 
-        List<DocumentType> documentTypes = documentTypeRepository.findByRequiredTrue();
-        List<VendorDocument> documents = vendorDocumentRepository.findByVendor(vendor);
+        // ✅ REQUIRED document types
+        List<DocumentType> documentTypes =
+                documentTypeRepository.findByRequiredTrue();
 
-        // ✅ CORRECT PARAMETER ORDER
+        // ✅ Vendor documents
+        List<VendorDocument> documents =
+                vendorDocumentRepository.findByVendor(vendor);
+
+        // ✅ CORRECT PARAMETER ORDER (THIS FIXES YOUR ERROR)
         double score = ComplianceScoringEngine.calculateScore(documentTypes, documents);
 
-        ComplianceScore complianceScore = complianceScoreRepository
-                .findByVendor_Id(vendorId)
-                .orElse(new ComplianceScore());
+        if (score < 0) {
+            throw new ValidationException("Compliance score cannot be negative");
+        }
+
+        ComplianceScore complianceScore =
+                complianceScoreRepository.findByVendor_Id(vendorId)
+                        .orElse(new ComplianceScore());
 
         complianceScore.setVendor(vendor);
         complianceScore.setScoreValue(score);
