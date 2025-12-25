@@ -2,8 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.model.DocumentType;
 import com.example.demo.service.DocumentTypeService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -17,17 +17,17 @@ public class DocumentTypeController {
     }
 
     @PostMapping
-    public DocumentType create(@RequestBody DocumentType type) {
-        return documentTypeService.createDocumentType(type);
+    public ResponseEntity<DocumentType> createDocumentType(@RequestBody DocumentType type) {
+        return ResponseEntity.ok(documentTypeService.createDocumentType(type));
     }
 
     @GetMapping
-    public List<DocumentType> getAll() {
-        return documentTypeService.getAllDocumentTypes();
+    public ResponseEntity<List<DocumentType>> getAllDocumentTypes() {
+        return ResponseEntity.ok(documentTypeService.getAllDocumentTypes());
     }
 
     @GetMapping("/{id}")
-    public DocumentType getById(@PathVariable Long id) {
-        return documentTypeService.getDocumentType(id);
+    public ResponseEntity<DocumentType> getDocumentType(@PathVariable Long id) {
+        return ResponseEntity.ok(documentTypeService.getDocumentType(id));
     }
 }
