@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.util;
 
 import com.example.demo.model.DocumentType;
 import com.example.demo.model.VendorDocument;
@@ -26,10 +26,6 @@ public class ComplianceScoringEngine {
             }
         }
 
-        if (totalWeight == 0) {
-            return 0;
-        }
-
-        return (earnedWeight / totalWeight) * 100;
+        return totalWeight == 0 ? 0 : (earnedWeight / totalWeight) * 100;
     }
 }
