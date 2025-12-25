@@ -51,7 +51,8 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
                 vendorDocumentRepository.findByVendor(vendor);
 
         double score =
-                ComplianceScoringEngine.calculateScore(requiredTypes, documents);
+                double score = ComplianceScoringEngine.calculateScore(documents, requiredTypes);
+
 
         if (score < 0) {
             throw new ValidationException("Compliance score cannot be negative");
