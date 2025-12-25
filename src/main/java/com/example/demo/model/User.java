@@ -40,7 +40,7 @@ public class User {
 
     // ✅ METHOD NAME MUST BE EXACTLY prePersist (TESTS CALL THIS DIRECTLY)
     @PrePersist
-    protected void prePersist() {
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
         if (this.role == null) {
             this.role = "USER";
