@@ -6,7 +6,6 @@ import com.example.demo.model.ComplianceRule;
 import com.example.demo.repository.ComplianceRuleRepository;
 import com.example.demo.service.ComplianceRuleService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -20,15 +19,12 @@ public class ComplianceRuleServiceImpl implements ComplianceRuleService {
 
     @Override
     public ComplianceRule createRule(ComplianceRule rule) {
-
-        if (rule.getRuleName() == null || rule.getRuleName().isBlank()) {
-            throw new ValidationException("Rule name is required");
+        List<ComplianceRule> existingRules = complianceRuleRepository.findAll();
+        for (ComplianceRule r : existingRules) {
+            if (r.getRuleName().equalsIgnoreCase(rule.getRuleName())) {
+                throw new ValidationException("Duplicate rule name");
+            }
         }
-
-        if (complianceRuleRepository.existsByRuleName(rule.getRuleName())) {
-            throw new ValidationException("Duplicate rule name");
-        }
-
         return complianceRuleRepository.save(rule);
     }
 
@@ -40,7 +36,6 @@ public class ComplianceRuleServiceImpl implements ComplianceRuleService {
     @Override
     public ComplianceRule getRule(Long id) {
         return complianceRuleRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Rule not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("ComplianceRule not found"));
     }
 }
