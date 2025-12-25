@@ -8,7 +8,7 @@ import com.example.demo.repository.ComplianceScoreRepository;
 import com.example.demo.repository.DocumentTypeRepository;
 import com.example.demo.repository.VendorDocumentRepository;
 import com.example.demo.service.ComplianceScoreService;
-import com.example.demo.service.ComplianceScoringEngine;
+import com.example.demo.util.ComplianceScoringEngine;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,7 +40,6 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
         List<DocumentType> documentTypes =
                 documentTypeRepository.findAll();
 
-        // ✅ CORRECT ORDER — THIS FIXES YOUR ERROR
         double score = ComplianceScoringEngine.calculateScore(
                 documents,
                 documentTypes
@@ -51,5 +50,11 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
         complianceScore.setEvaluatedAt(LocalDate.now());
 
         return complianceScoreRepository.save(complianceScore);
+    }
+
+    // ✅ MISSING METHOD — NOW ADDED
+    @Override
+    public List<ComplianceScore> getAllScores() {
+        return complianceScoreRepository.findAll();
     }
 }
