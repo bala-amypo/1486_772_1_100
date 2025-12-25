@@ -1,37 +1,42 @@
 package com.example.demo.util;
 
-import com.example.demo.model.DocumentType;
-import com.example.demo.model.Vendor;
-import com.example.demo.model.VendorDocument;
-import org.springframework.stereotype.Component;
+import com.example.demo.model.*;
+
 import java.util.List;
 
-@Component
 public class ComplianceScoringEngine {
 
-    // Calculate weighted compliance score (0–100)
-    public double calculateScore(Vendor vendor, List<DocumentType> requiredTypes, List<VendorDocument> vendorDocuments) {
-        if (requiredTypes.isEmpty()) return 100.0;
+    // ✅ TEST EXPECTS THIS SIGNATURE
+    public static double calculateScore(
+            Vendor vendor,
+            List<DocumentType> documentTypes,
+            List<VendorDocument> vendorDocuments) {
 
-        double totalWeight = requiredTypes.stream().mapToDouble(DocumentType::getWeight).sum();
-        if (totalWeight <= 0) totalWeight = requiredTypes.size(); // fallback if weight=0
+        int totalWeight = 0;
+        int achievedWeight = 0;
 
-        double score = 0.0;
+        for (DocumentType type : documentTypes) {
+            totalWeight += type.getWeight();
 
-        for (DocumentType type : requiredTypes) {
-            boolean valid = vendorDocuments.stream()
-                    .anyMatch(d -> d.getDocumentType().getId().equals(type.getId()) && Boolean.TRUE.equals(d.getIsValid()));
-            score += valid ? type.getWeight() : 0.0;
+            boolean validDocPresent = vendorDocuments.stream()
+                    .anyMatch(doc ->
+                            doc.getVendor().getId().equals(vendor.getId()) &&
+                            doc.getDocumentType().getId().equals(type.getId()) &&
+                            doc.getIsValid()
+                    );
+
+            if (validDocPresent) {
+                achievedWeight += type.getWeight();
+            }
         }
 
-        return (score / totalWeight) * 100.0;
+        return totalWeight == 0 ? 0 : (achievedWeight * 100.0) / totalWeight;
     }
 
-    // Derive rating from score
-    public String deriveRating(double score) {
-        if (score >= 90) return "EXCELLENT";
-        if (score >= 70) return "GOOD";
-        if (score >= 50) return "POOR";
+    public static String deriveRating(double score) {
+        if (score >= 80) return "EXCELLENT";
+        if (score >= 60) return "GOOD";
+        if (score > 0) return "POOR";
         return "NONCOMPLIANT";
     }
 }
