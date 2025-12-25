@@ -1,14 +1,8 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.ComplianceScore;
-import com.example.demo.model.DocumentType;
-import com.example.demo.model.Vendor;
-import com.example.demo.model.VendorDocument;
-import com.example.demo.repository.ComplianceScoreRepository;
-import com.example.demo.repository.DocumentTypeRepository;
-import com.example.demo.repository.VendorDocumentRepository;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.ComplianceScoreService;
-import com.example.demo.util.ComplianceScoringEngine;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,42 +11,77 @@ import java.util.List;
 @Service
 public class ComplianceScoreServiceImpl implements ComplianceScoreService {
 
+    private final VendorRepository vendorRepository;
     private final VendorDocumentRepository vendorDocumentRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final ComplianceScoreRepository complianceScoreRepository;
 
     public ComplianceScoreServiceImpl(
+            VendorRepository vendorRepository,
             VendorDocumentRepository vendorDocumentRepository,
             DocumentTypeRepository documentTypeRepository,
             ComplianceScoreRepository complianceScoreRepository
     ) {
+        this.vendorRepository = vendorRepository;
         this.vendorDocumentRepository = vendorDocumentRepository;
         this.documentTypeRepository = documentTypeRepository;
         this.complianceScoreRepository = complianceScoreRepository;
     }
 
+    // ===============================
+    // EVALUATE COMPLIANCE SCORE
+    // ===============================
     @Override
-    public ComplianceScore calculateComplianceScore(Vendor vendor) {
+    public ComplianceScore evaluateVendor(Long vendorId) {
 
-        List<VendorDocument> documents =
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+
+        List<DocumentType> documentTypes = documentTypeRepository.findAll();
+        List<VendorDocument> vendorDocuments =
                 vendorDocumentRepository.findByVendor(vendor);
 
-        List<DocumentType> documentTypes =
-                documentTypeRepository.findAll();
+        double totalWeight = 0;
+        double earnedWeight = 0;
 
-        double score = ComplianceScoringEngine.calculateScore(
-                documents,
-                documentTypes
-        );
+        for (DocumentType type : documentTypes) {
+            totalWeight += type.getWeight();
 
-        ComplianceScore complianceScore = ComplianceScore.create(vendor);
+            VendorDocument matchedDoc = vendorDocuments.stream()
+                    .filter(d -> d.getDocumentType().getId().equals(type.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (matchedDoc != null && matchedDoc.isValid()) {
+                earnedWeight += type.getWeight();
+            }
+        }
+
+        double score = totalWeight == 0 ? 0 : (earnedWeight / totalWeight) * 100;
+
+        ComplianceScore complianceScore =
+                complianceScoreRepository.findByVendor(vendor)
+                        .orElse(new ComplianceScore());
+
+        complianceScore.setVendor(vendor);
         complianceScore.setScore(score);
         complianceScore.setEvaluatedAt(LocalDate.now());
 
         return complianceScoreRepository.save(complianceScore);
     }
 
-    // ✅ MISSING METHOD — NOW ADDED
+    // ===============================
+    // GET SCORE BY VENDOR
+    // ===============================
+    @Override
+    public ComplianceScore getScore(Long vendorId) {
+        return complianceScoreRepository.findByVendorId(vendorId)
+                .orElseThrow(() -> new RuntimeException("Compliance score not found"));
+    }
+
+    // ===============================
+    // GET ALL SCORES
+    // ===============================
     @Override
     public List<ComplianceScore> getAllScores() {
         return complianceScoreRepository.findAll();
