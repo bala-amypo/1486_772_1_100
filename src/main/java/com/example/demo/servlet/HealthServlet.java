@@ -1,25 +1,16 @@
 package com.example.demo.servlet;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-
+import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/health")
 public class HealthServlet extends HttpServlet {
 
-    public HealthServlet() {
-        // public no-arg constructor
-    }
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("OK");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().write("{\"status\":\"UP\"}");
     }
 }
