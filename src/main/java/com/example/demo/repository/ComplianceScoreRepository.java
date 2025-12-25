@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface ComplianceScoreRepository extends JpaRepository<ComplianceScore, Long> {
 
+    // ✅ PROPERTY PATH (Vendor → id)
     Optional<ComplianceScore> findByVendor_Id(Long vendorId);
 }
