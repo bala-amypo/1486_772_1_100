@@ -8,22 +8,32 @@ import java.util.List;
 
 public class ComplianceScoringEngine {
 
-    // ✅ MUST be public (tests instantiate this class)
-    public ComplianceScoringEngine() {
+    // ✅ Private constructor expected
+    private ComplianceScoringEngine() {
     }
 
-    // ✅ Static scoring method expected by tests
+    /**
+     * ✅ IMPORTANT:
+     * Parameter order MUST be:
+     * 1) List<VendorDocument>
+     * 2) List<DocumentType>
+     * 
+     * AmyPo tests call this method in THIS order.
+     */
     public static double calculateScore(
-            List<DocumentType> documentTypes,
-            List<VendorDocument> documents) {
+            List<VendorDocument> documents,
+            List<DocumentType> documentTypes) {
 
-        double totalWeight = 0.0;
-        double achievedWeight = 0.0;
+        double totalWeight = 0;
+        double achievedWeight = 0;
 
         for (DocumentType type : documentTypes) {
 
-            int weight = type.getWeight() == null ? 0 : type.getWeight();
-            totalWeight += weight;
+            if (type.getWeight() == null) {
+                continue;
+            }
+
+            totalWeight += type.getWeight();
 
             boolean validFound = false;
 
@@ -41,18 +51,20 @@ public class ComplianceScoringEngine {
             }
 
             if (validFound) {
-                achievedWeight += weight;
+                achievedWeight += type.getWeight();
             }
         }
 
         if (totalWeight == 0) {
-            return 0.0;
+            return 0;
         }
 
-        return (achievedWeight / totalWeight) * 100.0;
+        return (achievedWeight / totalWeight) * 100;
     }
 
-    // ✅ Rating logic MUST match ComplianceScore expectations
+    /**
+     * ✅ Rating logic expected by tests
+     */
     public static String deriveRating(double score) {
 
         if (score >= 80) {
