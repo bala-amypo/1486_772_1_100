@@ -10,10 +10,13 @@ import java.util.List;
 
 public interface VendorDocumentRepository extends JpaRepository<VendorDocument, Long> {
 
-    List<VendorDocument> findByVendorId(Long vendorId);
+    // ✅ REQUIRED by tests
+    List<VendorDocument> findByVendor_Id(Long vendorId);
 
+    // ✅ Also used in service-level tests
     List<VendorDocument> findByVendor(Vendor vendor);
 
+    // ✅ Expiry validation test
     @Query("SELECT vd FROM VendorDocument vd WHERE vd.expiryDate < :cutoffDate")
     List<VendorDocument> findExpiredDocuments(LocalDate cutoffDate);
 }
