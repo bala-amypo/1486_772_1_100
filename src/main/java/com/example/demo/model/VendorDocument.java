@@ -23,33 +23,44 @@ public class VendorDocument {
     @Column(nullable = false)
     private String fileUrl;
 
-    @Column(nullable = false)
     private LocalDateTime uploadedAt;
 
     private LocalDate expiryDate;
 
-    @Column(nullable = false)
     private Boolean isValid;
 
+    // REQUIRED no-arg constructor
     public VendorDocument() {
     }
 
-    public VendorDocument(Vendor vendor, DocumentType documentType, String fileUrl, LocalDate expiryDate) {
+    // REQUIRED constructor
+    public VendorDocument(
+            Vendor vendor,
+            DocumentType documentType,
+            String fileUrl,
+            LocalDate expiryDate) {
+
         this.vendor = vendor;
         this.documentType = documentType;
         this.fileUrl = fileUrl;
         this.expiryDate = expiryDate;
     }
 
+    // IMPORTANT: MUST be PUBLIC (tests call this directly)
     @PrePersist
-    protected void prePersist() {
+    public void prePersist() {
         this.uploadedAt = LocalDateTime.now();
+
         if (this.expiryDate == null) {
             this.isValid = true;
         } else {
             this.isValid = this.expiryDate.isAfter(LocalDate.now());
         }
     }
+
+    // =====================
+    // GETTERS & SETTERS
+    // =====================
 
     public Long getId() {
         return id;
@@ -103,7 +114,7 @@ public class VendorDocument {
         return isValid;
     }
 
-    public void setIsValid(Boolean isValid) {
-        this.isValid = isValid;
+    public void setIsValid(Boolean valid) {
+        this.isValid = valid;
     }
 }
