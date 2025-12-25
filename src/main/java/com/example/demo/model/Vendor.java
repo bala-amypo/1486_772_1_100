@@ -47,7 +47,7 @@ public class Vendor {
     }
 
     @PrePersist
-    protected void prePersist() {
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
 
