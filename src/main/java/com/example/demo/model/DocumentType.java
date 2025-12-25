@@ -1,59 +1,66 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-@Table(
-        name = "document_types",
-        uniqueConstraints = @UniqueConstraint(columnNames = "type_name")
-)
-public class DocumentType {
+@Table(name = "vendor_documents")
+public class VendorDocument {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "type_name", nullable = false, unique = true)
-    private String typeName;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "vendor_id", nullable = false)
+    private Vendor vendor;
 
-    private String description;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "document_type_id", nullable = false)
+    private DocumentType documentType;
 
     @Column(nullable = false)
-    private Boolean required;
+    private String fileUrl;
 
-    @Column(nullable = false)
-    private Integer weight;
+    private LocalDateTime uploadedAt;
 
-    private LocalDateTime createdAt;
+    private LocalDate expiryDate;
 
-    @ManyToMany(mappedBy = "supportedDocumentTypes")
-    private Set<Vendor> vendors = new HashSet<>();
+    private Boolean isValid;
 
-    public DocumentType() {
+    // REQUIRED no-arg constructor
+    public VendorDocument() {
     }
 
-    public DocumentType(String typeName, String description, Boolean required, Integer weight) {
-        this.typeName = typeName;
-        this.description = description;
-        this.required = required;
-        this.weight = weight;
+    // REQUIRED constructor
+    public VendorDocument(
+            Vendor vendor,
+            DocumentType documentType,
+            String fileUrl,
+            LocalDate expiryDate) {
+
+        this.vendor = vendor;
+        this.documentType = documentType;
+        this.fileUrl = fileUrl;
+        this.expiryDate = expiryDate;
     }
 
+    // IMPORTANT: MUST be PUBLIC (tests call this directly)
     @PrePersist
-    protected void prePersist() {
-        this.createdAt = LocalDateTime.now();
+    public void prePersist() {
+        this.uploadedAt = LocalDateTime.now();
 
-        if (this.required == null) {
-            this.required = false;
-        }
-
-        if (this.weight == null || this.weight < 0) {
-            this.weight = 0;
+        if (this.expiryDate == null) {
+            this.isValid = true;
+        } else {
+            this.isValid = this.expiryDate.isAfter(LocalDate.now());
         }
     }
+
+    // =====================
+    // GETTERS & SETTERS
+    // =====================
 
     public Long getId() {
         return id;
@@ -63,47 +70,51 @@ public class DocumentType {
         this.id = id;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public Vendor getVendor() {
+        return vendor;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
-    public String getDescription() {
-        return description;
+    public DocumentType getDocumentType() {
+        return documentType;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
     }
 
-    public Boolean getRequired() {
-        return required;
+    public String getFileUrl() {
+        return fileUrl;
     }
 
-    public void setRequired(Boolean required) {
-        this.required = required;
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
-    public Integer getWeight() {
-        return weight;
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
     }
 
-    public void setWeight(Integer weight) {
-        this.weight = weight;
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDate getExpiryDate() {
+        return expiryDate;
     }
 
-    public Set<Vendor> getVendors() {
-        return vendors;
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
-    public void setVendors(Set<Vendor> vendors) {
-        this.vendors = vendors;
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(Boolean valid) {
+        this.isValid = valid;
     }
 }
