@@ -1,68 +1,32 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "compliance_scores")
 public class ComplianceScore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Tests expect OneToOne with unique vendor_id
     @OneToOne
-    @JoinColumn(name = "vendor_id", nullable = false, unique = true)
     private Vendor vendor;
 
-    private Double scoreValue;
-
-    private LocalDateTime lastEvaluated;
+    private double score;
 
     private String rating;
 
-    // REQUIRED no-arg constructor
-    public ComplianceScore() {
+    private LocalDate evaluatedAt;
+
+    protected ComplianceScore() {
+        // JPA
     }
 
-    // REQUIRED parameterized constructor
-    public ComplianceScore(Vendor vendor, Double scoreValue, String rating) {
-        this.vendor = vendor;
-        this.scoreValue = scoreValue;
-        this.rating = rating;
-    }
-
-    // IMPORTANT: MUST be PUBLIC (tests call this directly)
-    @PrePersist
-    public void prePersist() {
-        this.lastEvaluated = LocalDateTime.now();
-
-        if (this.scoreValue == null || this.scoreValue < 0) {
-            this.scoreValue = 0.0;
-        }
-
-        if (this.rating == null) {
-            if (this.scoreValue >= 80) {
-                this.rating = "HIGH";
-            } else if (this.scoreValue >= 50) {
-                this.rating = "MEDIUM";
-            } else {
-                this.rating = "LOW";
-            }
-        }
-    }
-
-    // =====================
-    // Getters and Setters
-    // =====================
+    // ---------- getters & setters ----------
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Vendor getVendor() {
@@ -73,20 +37,13 @@ public class ComplianceScore {
         this.vendor = vendor;
     }
 
-    public Double getScoreValue() {
-        return scoreValue;
+    public double getScore() {
+        return score;
     }
 
-    public void setScoreValue(Double scoreValue) {
-        this.scoreValue = scoreValue;
-    }
-
-    public LocalDateTime getLastEvaluated() {
-        return lastEvaluated;
-    }
-
-    public void setLastEvaluated(LocalDateTime lastEvaluated) {
-        this.lastEvaluated = lastEvaluated;
+    // 🔥 REQUIRED BY SERVICE & TESTS
+    public void setScore(double score) {
+        this.score = score;
     }
 
     public String getRating() {
@@ -95,5 +52,14 @@ public class ComplianceScore {
 
     public void setRating(String rating) {
         this.rating = rating;
+    }
+
+    public LocalDate getEvaluatedAt() {
+        return evaluatedAt;
+    }
+
+    // 🔥 REQUIRED BY SERVICE & TESTS
+    public void setEvaluatedAt(LocalDate evaluatedAt) {
+        this.evaluatedAt = evaluatedAt;
     }
 }
