@@ -1,36 +1,44 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "compliance_scores")
 public class ComplianceScore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
+    @JoinColumn(name = "vendor_id", unique = true)
     private Vendor vendor;
 
-    private double score;
+    private Double scoreValue;
+    private LocalDateTime lastEvaluated;
+    private String rating;
 
-    private LocalDate evaluatedAt;
+    public ComplianceScore() {}
 
-    protected ComplianceScore() {
+    public ComplianceScore(Vendor vendor, Double scoreValue, String rating) {
+        this.vendor = vendor;
+        this.scoreValue = scoreValue;
+        this.rating = rating;
     }
 
-    public static ComplianceScore create(Vendor vendor) {
-        ComplianceScore cs = new ComplianceScore();
-        cs.vendor = vendor;
-        return cs;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setScore(double score) {
-        this.score = score;
-    }
+    public Vendor getVendor() { return vendor; }
+    public void setVendor(Vendor vendor) { this.vendor = vendor; }
 
-    public void setEvaluatedAt(LocalDate evaluatedAt) {
-        this.evaluatedAt = evaluatedAt;
-    }
+    public Double getScoreValue() { return scoreValue; }
+    public void setScoreValue(Double scoreValue) { this.scoreValue = scoreValue; }
+
+    public LocalDateTime getLastEvaluated() { return lastEvaluated; }
+    public void setLastEvaluated(LocalDateTime lastEvaluated) { this.lastEvaluated = lastEvaluated; }
+
+    public String getRating() { return rating; }
+    public void setRating(String rating) { this.rating = rating; }
 }
