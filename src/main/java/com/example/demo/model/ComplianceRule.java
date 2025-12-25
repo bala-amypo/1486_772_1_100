@@ -40,7 +40,7 @@ public class ComplianceRule {
     // ✅ METHOD NAME MUST BE EXACT: prePersist()
     // Tests CALL this method directly
     @PrePersist
-    protected void prePersist() {
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
         if (this.threshold == null) {
             this.threshold = 0.0;
