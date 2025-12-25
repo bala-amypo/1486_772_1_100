@@ -11,9 +11,9 @@ public class ComplianceScore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ Tests expect OneToOne with Vendor and unique vendor_id
+    // Tests expect OneToOne with unique vendor_id
     @OneToOne
-    @JoinColumn(name = "vendor_id", unique = true, nullable = false)
+    @JoinColumn(name = "vendor_id", nullable = false, unique = true)
     private Vendor vendor;
 
     private Double scoreValue;
@@ -22,31 +22,26 @@ public class ComplianceScore {
 
     private String rating;
 
-    // ✅ No-arg constructor REQUIRED
+    // REQUIRED no-arg constructor
     public ComplianceScore() {
     }
 
-    // ✅ Parameterized constructor REQUIRED by tests
+    // REQUIRED parameterized constructor
     public ComplianceScore(Vendor vendor, Double scoreValue, String rating) {
         this.vendor = vendor;
         this.scoreValue = scoreValue;
         this.rating = rating;
     }
 
-    // ✅ Lifecycle method name MUST be prePersist()
+    // IMPORTANT: MUST be PUBLIC (tests call this directly)
     @PrePersist
-    protected void prePersist() {
+    public void prePersist() {
         this.lastEvaluated = LocalDateTime.now();
 
-        if (this.scoreValue == null) {
+        if (this.scoreValue == null || this.scoreValue < 0) {
             this.scoreValue = 0.0;
         }
 
-        if (this.scoreValue < 0) {
-            this.scoreValue = 0.0;
-        }
-
-        // ✅ Rating auto-derivation expected by tests
         if (this.rating == null) {
             if (this.scoreValue >= 80) {
                 this.rating = "HIGH";
@@ -59,7 +54,7 @@ public class ComplianceScore {
     }
 
     // =====================
-    // GETTERS & SETTERS
+    // Getters and Setters
     // =====================
 
     public Long getId() {
