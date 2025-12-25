@@ -2,35 +2,23 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
-
+import org.springframework.stereotype.Component;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
-    private final String secret;
-    private final long validityInMs;
+    private final String secret = "SECRET_KEY"; // replace with env/config
+    private final long validityInMs = 3600000; // 1 hour
 
-    public JwtUtil(String secret, long validityInMs) {
-        this.secret = secret;
-        this.validityInMs = validityInMs;
-    }
-
-    public String generateToken(Authentication authentication,
-                                Long userId,
-                                String email,
-                                String role) {
-
-        Claims claims = Jwts.claims().setSubject(email);
-        claims.put("userId", userId);
-        claims.put("role", role);
-
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
-
+    public String generateToken(Authentication authentication, Long userId, String email, String role) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiry)
+                .claim("userId", userId)
+                .claim("email", email)
+                .claim("role", role)
+                .setSubject(authentication.getName())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + validityInMs))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -45,26 +33,12 @@ public class JwtUtil {
     }
 
     public Long getUserIdFromToken(String token) {
-        return ((Number) Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("userId")).longValue();
+        return ((Number) Jwts.parser().setSigningKey(secret)
+                .parseClaimsJws(token).getBody().get("userId")).longValue();
     }
 
     public String getRoleFromToken(String token) {
-        return (String) Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role");
-    }
-
-    public String getEmailFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return (String) Jwts.parser().setSigningKey(secret)
+                .parseClaimsJws(token).getBody().get("role");
     }
 }
