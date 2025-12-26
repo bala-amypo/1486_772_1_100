@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,8 @@ public class Vendor {
 
     private String name;
 
+    private LocalDateTime createdAt;
+
     @ManyToMany
     @JoinTable(
         name = "vendor_document_types",
@@ -24,21 +27,16 @@ public class Vendor {
 
     @PrePersist
     public void prePersist() {
-        if (supportedDocumentTypes == null) {
-            supportedDocumentTypes = new HashSet<>();
-        }
+        this.createdAt = LocalDateTime.now();
     }
 
-    public void addDocumentType(DocumentType type) {
-        supportedDocumentTypes.add(type);
-        type.getVendors().add(this);
-    }
+    public Vendor() {}
 
+    // getters & setters
     public Long getId() { return id; }
     public String getName() { return name; }
-    public Set<DocumentType> getSupportedDocumentTypes() {
-        return supportedDocumentTypes;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public Set<DocumentType> getSupportedDocumentTypes() { return supportedDocumentTypes; }
 
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
