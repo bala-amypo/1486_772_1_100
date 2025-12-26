@@ -15,12 +15,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(User user) {
+    public User registerUser(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    public User getById(Long id) {   // 🔥 THIS WAS MISSING
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    @Override
+    public User getById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 }

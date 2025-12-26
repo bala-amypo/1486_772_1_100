@@ -3,6 +3,8 @@ package com.example.demo.service;
 import com.example.demo.model.User;
 
 public interface UserService {
-    User register(User user);
-    User getById(Long id); // 🔥 REQUIRED
+
+    User registerUser(User user);      // 🔥 REQUIRED
+    User findByEmail(String email);    // 🔥 REQUIRED
+    User getById(Long id);
 }
