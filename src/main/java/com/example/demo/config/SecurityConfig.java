@@ -18,21 +18,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          CustomUserDetailsService userDetailsService) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    // ✅ REMOVE JwtAuthenticationFilter from constructor
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
-    // ✅ ADD THIS BEAN
+    // ✅ CREATE JwtUtil bean
     @Bean
     public JwtUtil jwtUtil() {
         String secret = "mySecretKey123456789012345678901234567890";
         long expiration = 86400000L; // 24 hours in milliseconds
         return new JwtUtil(secret, expiration);
+    }
+
+    // ✅ CREATE JwtAuthenticationFilter bean
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil(), userDetailsService);
     }
 
     @Bean
@@ -53,7 +57,7 @@ public class SecurityConfig {
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(
-                jwtAuthenticationFilter,
+                jwtAuthenticationFilter(), // ✅ Use the bean method
                 UsernamePasswordAuthenticationFilter.class
         );
 
