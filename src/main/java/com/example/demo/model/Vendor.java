@@ -13,31 +13,30 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
+    private String vendorName;
+    private String industry;
     private LocalDateTime createdAt;
 
     @ManyToMany
-    @JoinTable(
-        name = "vendor_document_types",
-        joinColumns = @JoinColumn(name = "vendor_id"),
-        inverseJoinColumns = @JoinColumn(name = "document_type_id")
-    )
     private Set<DocumentType> supportedDocumentTypes = new HashSet<>();
 
     @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+    void prePersist() {
+        createdAt = LocalDateTime.now();
     }
 
-    public Vendor() {}
-
-    // getters & setters
     public Long getId() { return id; }
-    public String getName() { return name; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public Set<DocumentType> getSupportedDocumentTypes() { return supportedDocumentTypes; }
-
     public void setId(Long id) { this.id = id; }
-    public void setName(String name) { this.name = name; }
+
+    public String getVendorName() { return vendorName; }
+    public void setVendorName(String vendorName) { this.vendorName = vendorName; }
+
+    public String getIndustry() { return industry; }
+    public void setIndustry(String industry) { this.industry = industry; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public Set<DocumentType> getSupportedDocumentTypes() {
+        return supportedDocumentTypes;
+    }
 }
