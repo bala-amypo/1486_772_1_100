@@ -1,9 +1,11 @@
 package com.example.demo.model;
 
+import com.example.demo.exception.ValidationException;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "vendor_documents")
 public class VendorDocument {
 
     @Id
@@ -16,68 +18,26 @@ public class VendorDocument {
     @ManyToOne
     private DocumentType documentType;
 
-    private String fileUrl;
-
     private LocalDate expiryDate;
 
-    private boolean valid;
-
-    /* ---------------- GETTERS & SETTERS ---------------- */
-
-    public Long getId() {
-        return id;
+    @PrePersist
+    public void validate() {
+        if (expiryDate != null && expiryDate.isBefore(LocalDate.now())) {
+            throw new ValidationException("Document expired");
+        }
     }
 
-    public Vendor getVendor() {
-        return vendor;
-    }
+    public Long getId() { return id; }
+    public Vendor getVendor() { return vendor; }
+    public DocumentType getDocumentType() { return documentType; }
+    public LocalDate getExpiryDate() { return expiryDate; }
 
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
-    }
-
-    public DocumentType getDocumentType() {
-        return documentType;
-    }
-
+    public void setId(Long id) { this.id = id; }
+    public void setVendor(Vendor vendor) { this.vendor = vendor; }
     public void setDocumentType(DocumentType documentType) {
         this.documentType = documentType;
     }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-
     public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
-
-    // ✅ REQUIRED BY TESTS + ComplianceScoringEngine
-    public Boolean getIsValid() {
-        return valid;
-    }
-
-    // ✅ REQUIRED BY TESTS
-    @PrePersist
-    public void prePersist() {
-        if (expiryDate != null && expiryDate.isBefore(LocalDate.now())) {
-            this.valid = false;
-        }
     }
 }
