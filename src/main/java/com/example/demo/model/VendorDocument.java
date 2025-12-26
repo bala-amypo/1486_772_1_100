@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "vendor_documents")
 public class VendorDocument {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String fileUrl;
+    private LocalDate expiryDate;
+    private Boolean isValid;
+    private LocalDate uploadedAt;
 
     @ManyToOne
     private Vendor vendor;
@@ -17,24 +21,28 @@ public class VendorDocument {
     @ManyToOne
     private DocumentType documentType;
 
-    private LocalDate expiryDate;
-
     @PrePersist
-    public void prePersist() {
-        if (expiryDate == null) {
-            expiryDate = LocalDate.now().plusYears(1);
-        }
+    void prePersist() {
+        uploadedAt = LocalDate.now();
     }
 
-    public VendorDocument() {}
-
-    // getters & setters
     public Long getId() { return id; }
-    public Vendor getVendor() { return vendor; }
-    public DocumentType getDocumentType() { return documentType; }
-    public LocalDate getExpiryDate() { return expiryDate; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setVendor(Vendor vendor) { this.vendor = vendor; }
-    public void setDocumentType(DocumentType documentType) { this.documentType = documentType; }
+    public String getFileUrl() { return fileUrl; }
+    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+
+    public LocalDate getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
+
+    public Boolean getIsValid() { return isValid; }
+    public void setIsValid(Boolean isValid) { this.isValid = isValid; }
+
+    public Vendor getVendor() { return vendor; }
+    public void setVendor(Vendor vendor) { this.vendor = vendor; }
+
+    public DocumentType getDocumentType() { return documentType; }
+    public void setDocumentType(DocumentType documentType) { this.documentType = documentType; }
+
+    public LocalDate getUploadedAt() { return uploadedAt; }
 }
