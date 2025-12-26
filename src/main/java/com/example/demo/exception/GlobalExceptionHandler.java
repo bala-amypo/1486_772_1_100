@@ -1,7 +1,7 @@
-package com.example.demo.exception;
+package com.example.demo.exceptionhandler;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.demo.exception.ValidationException;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -10,24 +10,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(ValidationException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+    public ResponseEntity<Map<String, String>> handleValidationException(
+            ValidationException ex) {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGeneral(Exception ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "Internal Server Error");
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }
