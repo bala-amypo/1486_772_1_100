@@ -9,6 +9,7 @@ import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,30 +28,36 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    // ✅ REGISTER (NO SECURITY ISSUES)
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
         return ResponseEntity.ok(userService.registerUser(user));
     }
 
-    // ✅ LOGIN (FIXED — NO 403, NO COMPILE ERROR)
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
-        // authenticate user
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                request.getEmail(),
+                                request.getPassword()
+                        )
+                );
 
-        // generate JWT (friend-style)
-        String token = jwtUtil.generateToken(request.getEmail());
+        User user = userService.findByEmail(request.getEmail());
+
+        String token = jwtUtil.generateToken(
+                authentication,
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
+        );
 
         AuthResponse response = new AuthResponse(
                 token,
-                request.getEmail()
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
         );
 
         return ResponseEntity.ok(response);
