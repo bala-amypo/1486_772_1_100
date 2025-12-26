@@ -1,22 +1,9 @@
-package com.example.demo.service.impl;
-
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.exception.ValidationException;
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.service.UserService;
-
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-@Service   // ⭐ REQUIRED so Spring can find it
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // ⚠️ Constructor order MUST match tests
     public UserServiceImpl(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder) {
@@ -28,7 +15,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(User user) {
 
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new ValidationException("Duplicate email");
         }
 
