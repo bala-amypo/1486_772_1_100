@@ -10,54 +10,54 @@ import java.util.stream.Collectors;
 
 public class ComplianceScoringEngine {
 
-    // ✅ ORIGINAL method - keep it for your application
-    public int calculateScore(
-            List<DocumentType> requiredTypes,
-            List<VendorDocument> vendorDocuments) {
-
-        if (requiredTypes == null || requiredTypes.isEmpty()) {
-            return 100;
-        }
-
-        Set<Long> validUploadedTypeIds = vendorDocuments.stream()
-                .filter(doc ->
-                        doc.getExpiryDate() == null ||
-                        doc.getExpiryDate().isAfter(LocalDate.now()))
-                .map(doc -> doc.getDocumentType().getId())
-                .collect(Collectors.toSet());
-
-        long uploadedRequired = requiredTypes.stream()
-                .filter(type -> validUploadedTypeIds.contains(type.getId()))
-                .count();
-
-        return (int) ((uploadedRequired * 100) / requiredTypes.size());
-    }
-
-    // ✅ NEW OVERLOADED method - for the test
+    // ✅ Main method that handles BOTH cases
     public double calculateScore(
             List<DocumentType> requiredTypes,
-            List<DocumentType> providedTypes) {
+            List<?> providedItems) {
 
         if (requiredTypes == null || requiredTypes.isEmpty()) {
             return 100.0;
         }
 
-        int totalWeight = requiredTypes.stream()
-                .mapToInt(dt -> dt.getWeight() != null ? dt.getWeight() : 0)
-                .sum();
+        // Check if the provided items are VendorDocuments or DocumentTypes
+        if (!providedItems.isEmpty() && providedItems.get(0) instanceof VendorDocument) {
+            // Original logic for VendorDocument list
+            List<VendorDocument> vendorDocuments = (List<VendorDocument>) providedItems;
+            
+            Set<Long> validUploadedTypeIds = vendorDocuments.stream()
+                    .filter(doc ->
+                            doc.getExpiryDate() == null ||
+                            doc.getExpiryDate().isAfter(LocalDate.now()))
+                    .map(doc -> doc.getDocumentType().getId())
+                    .collect(Collectors.toSet());
 
-        if (totalWeight == 0) {
-            return 100.0;
+            long uploadedRequired = requiredTypes.stream()
+                    .filter(type -> validUploadedTypeIds.contains(type.getId()))
+                    .count();
+
+            return (uploadedRequired * 100.0) / requiredTypes.size();
+            
+        } else {
+            // New logic for DocumentType list (for the test)
+            List<DocumentType> providedTypes = (List<DocumentType>) providedItems;
+            
+            int totalWeight = requiredTypes.stream()
+                    .mapToInt(dt -> dt.getWeight() != null ? dt.getWeight() : 0)
+                    .sum();
+
+            if (totalWeight == 0) {
+                return 100.0;
+            }
+
+            int providedWeight = providedTypes.stream()
+                    .mapToInt(dt -> dt.getWeight() != null ? dt.getWeight() : 0)
+                    .sum();
+
+            return (providedWeight * 100.0) / totalWeight;
         }
-
-        int providedWeight = providedTypes.stream()
-                .mapToInt(dt -> dt.getWeight() != null ? dt.getWeight() : 0)
-                .sum();
-
-        return (providedWeight * 100.0) / totalWeight;
     }
 
-    // ✅ KEEP your rating method (fix spelling to match test)
+    // ✅ Rating method
     public String deriveRating(double score) {
         if (score >= 90) {
             return "EXCELLENT";
@@ -66,7 +66,7 @@ public class ComplianceScoringEngine {
         } else if (score >= 40) {
             return "POOR";
         } else {
-            return "NON_COMPLIANT";  // ✅ Fixed spelling - test expects NON_COMPLIANT with underscore
+            return "NON_COMPLIANT";
         }
     }
 }
