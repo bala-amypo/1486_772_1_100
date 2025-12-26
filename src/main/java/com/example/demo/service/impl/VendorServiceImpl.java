@@ -11,25 +11,25 @@ import java.util.List;
 @Service
 public class VendorServiceImpl implements VendorService {
 
-    private final VendorRepository repository;
+    private final VendorRepository vendorRepository;
 
-    public VendorServiceImpl(VendorRepository repository) {
-        this.repository = repository;
+    public VendorServiceImpl(VendorRepository vendorRepository) {
+        this.vendorRepository = vendorRepository;
     }
 
     @Override
     public Vendor createVendor(Vendor vendor) {
-        return repository.save(vendor);
+        return vendorRepository.save(vendor);
     }
 
     @Override
     public Vendor getVendor(Long id) {
-        return repository.findById(id)
+        return vendorRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Vendor not found"));
     }
 
     @Override
     public List<Vendor> getAllVendors() {
-        return repository.findAll();
+        return vendorRepository.findAll();
     }
 }
