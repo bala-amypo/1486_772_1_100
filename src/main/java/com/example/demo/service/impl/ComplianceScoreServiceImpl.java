@@ -1,20 +1,18 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.ComplianceScore;
-import com.example.demo.model.DocumentType;
-import com.example.demo.model.Vendor;
-import com.example.demo.model.VendorDocument;
-import com.example.demo.repository.ComplianceScoreRepository;
-import com.example.demo.repository.DocumentTypeRepository;
-import com.example.demo.repository.VendorDocumentRepository;
-import com.example.demo.repository.VendorRepository;
+import com.example.demo.exception.ValidationException;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.ComplianceScoreService;
 import com.example.demo.util.ComplianceScoringEngine;
+
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class ComplianceScoreServiceImpl implements ComplianceScoreService {
 
     private final VendorRepository vendorRepository;
@@ -22,10 +20,9 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
     private final VendorDocumentRepository vendorDocumentRepository;
     private final ComplianceScoreRepository complianceScoreRepository;
 
-    private final ComplianceScoringEngine scoringEngine =
-            new ComplianceScoringEngine();
+    private final ComplianceScoringEngine scoringEngine = new ComplianceScoringEngine();
 
-    // ⚠️ Constructor order REQUIRED by tests
+    // ⚠ Constructor order MUST match tests
     public ComplianceScoreServiceImpl(
             VendorRepository vendorRepository,
             DocumentTypeRepository documentTypeRepository,
@@ -45,31 +42,28 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Vendor not found"));
 
-        List<DocumentType> required =
+        List<DocumentType> requiredTypes =
                 documentTypeRepository.findByRequiredTrue();
 
-        List<VendorDocument> docs =
+        List<VendorDocument> vendorDocs =
                 vendorDocumentRepository.findByVendor(vendor);
 
-        double score =
-                scoringEngine.calculateScore(required, docs);
+        double score = scoringEngine.calculateScore(requiredTypes, vendorDocs);
 
         if (score < 0) {
-            throw new IllegalArgumentException(
-                    "Compliance score cannot be negative");
+            throw new ValidationException("Compliance score cannot be negative");
         }
 
-        ComplianceScore cs =
-                complianceScoreRepository
-                        .findByVendor_Id(vendorId)
+        ComplianceScore complianceScore =
+                complianceScoreRepository.findByVendor_Id(vendorId)
                         .orElse(new ComplianceScore());
 
-        cs.setVendor(vendor);
-        cs.setScoreValue(score);
-        cs.setRating(scoringEngine.deriveRating(score));
-        cs.setLastEvaluated(LocalDateTime.now());
+        complianceScore.setVendor(vendor);
+        complianceScore.setScoreValue(score);
+        complianceScore.setRating(scoringEngine.deriveRating(score));
+        complianceScore.setLastEvaluated(LocalDateTime.now());
 
-        return complianceScoreRepository.save(cs);
+        return complianceScoreRepository.save(complianceScore);
     }
 
     @Override
