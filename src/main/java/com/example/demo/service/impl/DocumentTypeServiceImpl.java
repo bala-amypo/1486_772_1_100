@@ -19,17 +19,14 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     public DocumentType create(DocumentType type) {
+        if (type.getWeight() <= 0) {
+            throw new ValidationException("Weight must be positive");
+        }
         return repository.save(type);
     }
 
     @Override
     public List<DocumentType> getRequiredTypes() {
         return repository.findByRequiredTrue();
-    }
-
-    @Override
-    public DocumentType getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ValidationException("DocumentType not found"));
     }
 }
