@@ -11,24 +11,18 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class SwaggerConfig {
+public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-
-                // API Info
                 .info(new Info()
                         .title("JWT Demo API")
                         .version("1.0")
                         .description("Simple JWT Demo Project for Students"))
-
-                // Server Configuration
                 .servers(List.of(
                         new Server().url("https://9020.pro604cr.amypo.ai/")
                 ))
-
-                // Security Configuration (JWT Bearer)
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",
                                 new SecurityScheme()
@@ -36,4 +30,5 @@ public class SwaggerConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                                         .description("Enter JWT token")));
-    
+    }
+}
