@@ -27,7 +27,7 @@ public class DocumentType {
     public DocumentType() {}
 
     @PrePersist
-    void prePersist() {
+    public void prePersist() {  // ✅ Changed to PUBLIC
         createdAt = LocalDateTime.now();
     }
 
