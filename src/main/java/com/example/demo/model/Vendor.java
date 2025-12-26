@@ -2,54 +2,62 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "vendors")
 public class Vendor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String status;
+    @Column(unique = true)
+    private String vendorName;
 
+    private String email;
+    private String phone;
+    private String industry;
     private LocalDateTime createdAt;
 
+    @ManyToMany
+    private Set<DocumentType> supportedDocumentTypes = new HashSet<>();
+
+    public Vendor() {}
+
     @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        if (this.status == null) {
-            this.status = "ACTIVE";
-        }
+    void prePersist() {
+        createdAt = LocalDateTime.now();
     }
 
-    // ===== Getters & Setters =====
+    // getters & setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
+    public String getVendorName() { return vendorName; }
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
- 
-    public void setId(Long id) {
-        this.id = id;
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getIndustry() { return industry; }
+    public void setIndustry(String industry) { this.industry = industry; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
- 
-    public String getName() {
-        return name;
+
+    public Set<DocumentType> getSupportedDocumentTypes() {
+        return supportedDocumentTypes;
     }
- 
-    public void setName(String name) {
-        this.name = name;
-    }
- 
-    public String getStatus() {
-        return status;
-    }
- 
-    public void setStatus(String status) {
-        this.status = status;
-    }
- 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public void setSupportedDocumentTypes(Set<DocumentType> supportedDocumentTypes) {
+        this.supportedDocumentTypes = supportedDocumentTypes;
     }
 }
