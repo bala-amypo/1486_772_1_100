@@ -3,10 +3,8 @@ package com.example.demo.config;
 import com.example.demo.security.JwtAuthenticationFilter;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.security.CustomUserDetailsService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -28,10 +26,9 @@ public class SecurityConfig {
 
     @Bean
     public JwtUtil jwtUtil() {
-        return new JwtUtil(
-                "mySecretKey123456789012345678901234567890",
-                86400000L
-        );
+        String secret = "mySecretKey123456789012345678901234567890";
+        long expiration = 86400000L;
+        return new JwtUtil(secret, expiration);
     }
 
     @Bean
@@ -41,40 +38,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-
-                // ✅ Allow preflight
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // ✅ Auth endpoints
-                .requestMatchers("/auth/**").permitAll()
-
-                // ✅ Swagger
                 .requestMatchers(
+                        "/auth/**",
                         "/swagger-ui/**",
-                        "/swagger-ui.html",
                         "/v3/api-docs/**"
                 ).permitAll()
-
-                // ✅ Root & error pages (prevents Whitelabel)
-                .requestMatchers("/", "/error", "/favicon.ico").permitAll()
-
-                // ✅ Protect APIs
                 .requestMatchers("/api/**").authenticated()
-
-                // ✅ Everything else allowed
-                .anyRequest().permitAll()
-            )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(
-                    jwtAuthenticationFilter(),
-                    UsernamePasswordAuthenticationFilter.class
+                .anyRequest().authenticated()   // ✅ FIXED
             );
+
+        http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(
+                jwtAuthenticationFilter(),
+                UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }
