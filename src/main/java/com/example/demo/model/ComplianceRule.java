@@ -11,23 +11,54 @@ public class ComplianceRule {
     private Long id;
 
     private String ruleName;
-    private String matchType;
-    private Double threshold;
+
+    private String description;
+
+    private boolean active;
+
     private LocalDateTime createdAt;
 
     @PrePersist
-    void prePersist() {
-        createdAt = LocalDateTime.now();
-        threshold = 0.0;
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.active = true;
     }
 
-    public Long getId() { return id; }
-    public String getRuleName() { return ruleName; }
-    public void setRuleName(String ruleName) { this.ruleName = ruleName; }
+    // ===== Getters & Setters =====
 
-    public String getMatchType() { return matchType; }
-    public void setMatchType(String matchType) { this.matchType = matchType; }
+    public Long getId() {
+        return id;
+    }
 
-    public Double getThreshold() { return threshold; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+ 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+ 
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
