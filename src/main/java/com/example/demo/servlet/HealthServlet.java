@@ -9,6 +9,8 @@ import java.io.IOException;
 @WebServlet(urlPatterns = "/health")
 public class HealthServlet extends HttpServlet {
 
+    public HealthServlet() {}
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
