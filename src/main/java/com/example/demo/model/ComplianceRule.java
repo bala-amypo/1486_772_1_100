@@ -1,10 +1,9 @@
-
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "compliance_rules")
 public class ComplianceRule {
 
     @Id
@@ -12,19 +11,23 @@ public class ComplianceRule {
     private Long id;
 
     private String ruleName;
-
-    private Double score;
+    private String matchType;
+    private Double threshold;
+    private LocalDateTime createdAt;
 
     @PrePersist
-    public void prePersist() {
-        if (score == null) {
-            score = 0.0;
-        }
+    void prePersist() {
+        createdAt = LocalDateTime.now();
+        threshold = 0.0;
     }
 
-    public ComplianceRule() {}
+    public Long getId() { return id; }
+    public String getRuleName() { return ruleName; }
+    public void setRuleName(String ruleName) { this.ruleName = ruleName; }
 
-    // getters & setters
-    public Double getScore() { return score; }
-    public void setScore(Double score) { this.score = score; }
+    public String getMatchType() { return matchType; }
+    public void setMatchType(String matchType) { this.matchType = matchType; }
+
+    public Double getThreshold() { return threshold; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
