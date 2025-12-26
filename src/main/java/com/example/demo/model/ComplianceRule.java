@@ -10,6 +10,8 @@ public class ComplianceRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String ruleName;
+
     private Double score;
 
     @PrePersist
@@ -19,9 +21,9 @@ public class ComplianceRule {
         }
     }
 
-    public Long getId() { return id; }
-    public Double getScore() { return score; }
+    public ComplianceRule() {}
 
-    public void setId(Long id) { this.id = id; }
+    // getters & setters
+    public Double getScore() { return score; }
     public void setScore(Double score) { this.score = score; }
 }
