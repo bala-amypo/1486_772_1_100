@@ -1,3 +1,4 @@
+
 package com.example.demo.security;
 
 import com.example.demo.model.User;
@@ -11,12 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
-@Service   // ⭐ THIS IS THE KEY
+@Service   
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // Constructor injection (tests expect this)
+    
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
