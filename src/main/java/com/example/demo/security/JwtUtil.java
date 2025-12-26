@@ -3,98 +3,55 @@ package com.example.demo.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.Authentication;
 
 import java.util.Date;
 
 public class JwtUtil {
 
+    // ✅ NAME MATCHES CONFIG (@Value jwt.secret)
     private final String secret;
-    private final long validityInMs;
 
-    // REQUIRED constructor (tests instantiate directly)
-    public JwtUtil(String secret, long validityInMs) {
+    // ✅ NAME MATCHES CONFIG (@Value jwt.expiration)
+    private final long expiration;
+
+    // ✅ REQUIRED constructor (used by SecurityConfig)
+    public JwtUtil(String secret, long expiration) {
         this.secret = secret;
-        this.validityInMs = validityInMs;
+        this.expiration = expiration;
     }
 
-    // ✅ REQUIRED by AuthController + tests
-    public String generateToken(
-            Authentication authentication,
-            Long userId,
-            String email,
-            String role) {
+    // ✅ USED DURING LOGIN
+    public String generateToken(String email) {
 
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
+        Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .setSubject(email)
-                .claim("userId", userId)
-                .claim("role", role)
                 .setIssuedAt(now)
-                .setExpiration(expiry)
+                .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
-    // ✅ ADDED: Extract username/email from token (required by JwtAuthenticationFilter)
+    // ✅ USED BY JwtAuthenticationFilter
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // ✅ USED BY JwtAuthenticationFilter
     public String extractUsername(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
-    }
-
-    // ✅ UPDATED: Validate token with username check (required by JwtAuthenticationFilter)
-    public boolean validateToken(String token, String username) {
-        try {
-            String extractedUsername = extractUsername(token);
-            return (extractedUsername.equals(username) && !isTokenExpired(token));
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ KEPT: Original single-parameter validation (if needed elsewhere)
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ ADDED: Check if token is expired
-    private boolean isTokenExpired(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
-            return claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            return true;
-        }
-    }
-
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.get("userId", Long.class);
-    }
-
-    public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.get("role", String.class);
     }
 }
