@@ -1,33 +1,34 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.VendorDTO;
 import com.example.demo.model.Vendor;
 import com.example.demo.service.VendorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/vendors")
+@RequestMapping("/vendors")
 public class VendorController {
 
-    private final VendorService vendorService;
+    private final VendorService service;
 
-    public VendorController(VendorService vendorService) { this.vendorService = vendorService; }
+    public VendorController(VendorService service) {
+        this.service = service;
+    }
 
     @PostMapping
     public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor) {
-        return ResponseEntity.ok(vendorService.createVendor(vendor));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Vendor>> getAllVendors() {
-        return ResponseEntity.ok(vendorService.getAllVendors());
+        return ResponseEntity.ok(service.createVendor(vendor));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Vendor> getVendor(@PathVariable Long id) {
-        return ResponseEntity.ok(vendorService.getVendor(id));
+        return ResponseEntity.ok(service.getVendor(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Vendor>> getAllVendors() {
+        return ResponseEntity.ok(service.getAllVendors());
     }
 }
