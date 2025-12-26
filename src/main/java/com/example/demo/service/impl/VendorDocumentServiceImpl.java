@@ -1,8 +1,12 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ValidationException;
-import com.example.demo.model.*;
-import com.example.demo.repository.*;
+import com.example.demo.model.DocumentType;
+import com.example.demo.model.Vendor;
+import com.example.demo.model.VendorDocument;
+import com.example.demo.repository.DocumentTypeRepository;
+import com.example.demo.repository.VendorDocumentRepository;
+import com.example.demo.repository.VendorRepository;
 import com.example.demo.service.VendorDocumentService;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +17,17 @@ import java.util.List;
 public class VendorDocumentServiceImpl implements VendorDocumentService {
 
     private final VendorRepository vendorRepository;
-    private final DocumentTypeRepository documentTypeRepository;
-    private final VendorDocumentRepository vendorDocumentRepository;
+    private final DocumentTypeRepository typeRepository;
+    private final VendorDocumentRepository documentRepository;
 
     public VendorDocumentServiceImpl(
             VendorRepository vendorRepository,
-            DocumentTypeRepository documentTypeRepository,
-            VendorDocumentRepository vendorDocumentRepository) {
+            DocumentTypeRepository typeRepository,
+            VendorDocumentRepository documentRepository) {
 
         this.vendorRepository = vendorRepository;
-        this.documentTypeRepository = documentTypeRepository;
-        this.vendorDocumentRepository = vendorDocumentRepository;
+        this.typeRepository = typeRepository;
+        this.documentRepository = documentRepository;
     }
 
     @Override
@@ -33,37 +37,25 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
             VendorDocument document) {
 
         Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+                .orElseThrow(() -> new ValidationException("Vendor not found"));
 
-        DocumentType type = documentTypeRepository.findById(typeId)
-                .orElseThrow(() -> new RuntimeException("Document type not found"));
-
-        if (document.getFileUrl() == null || document.getFileUrl().isBlank()) {
-            throw new ValidationException("File URL is required");
-        }
+        DocumentType type = typeRepository.findById(typeId)
+                .orElseThrow(() -> new ValidationException("DocumentType not found"));
 
         document.setVendor(vendor);
         document.setDocumentType(type);
 
-        if (document.getExpiryDate() != null &&
-                document.getExpiryDate().isBefore(LocalDate.now())) {
-            document.setValid(false);
-        } else {
-            document.setValid(true);
-        }
-
-        document.prePersist();
-        return vendorDocumentRepository.save(document);
+        return documentRepository.save(document);
     }
 
     @Override
-    public List<VendorDocument> getDocumentsForVendor(Long vendorId) {
-        return vendorDocumentRepository.findByVendor_Id(vendorId);
+    public VendorDocument getDocument(Long id) {
+        return documentRepository.findById(id)
+                .orElseThrow(() -> new ValidationException("Document not found"));
     }
 
     @Override
-    public VendorDocument getDocument(Long documentId) {
-        return vendorDocumentRepository.findById(documentId)
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+    public List<VendorDocument> getExpiredDocuments() {
+        return documentRepository.findByExpiryDateBefore(LocalDate.now());
     }
 }

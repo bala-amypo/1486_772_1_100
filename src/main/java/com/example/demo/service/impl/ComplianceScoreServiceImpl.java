@@ -1,37 +1,16 @@
-package com.example.demo.service.impl;
+package com.example.demo.service;
 
-import com.example.demo.model.*;
-import com.example.demo.repository.ComplianceScoreRepository;
-import com.example.demo.util.ComplianceScoringEngine;
-import org.springframework.stereotype.Service;
+import com.example.demo.model.ComplianceScore;
+import com.example.demo.model.DocumentType;
+import com.example.demo.model.Vendor;
+import com.example.demo.model.VendorDocument;
 
 import java.util.List;
 
-@Service
-public class ComplianceScoreServiceImpl {
+public interface ComplianceScoreService {
 
-    private final ComplianceScoreRepository complianceScoreRepository;
-    private final ComplianceScoringEngine scoringEngine;
-
-    public ComplianceScoreServiceImpl(
-            ComplianceScoreRepository complianceScoreRepository) {
-        this.complianceScoreRepository = complianceScoreRepository;
-        this.scoringEngine = new ComplianceScoringEngine();
-    }
-
-    public ComplianceScore calculateScore(
+    ComplianceScore calculate(
             Vendor vendor,
-            List<DocumentType> documentTypes,
-            List<VendorDocument> vendorDocuments) {
-
-        double score = scoringEngine.calculateScore(documentTypes, vendorDocuments);
-        String rating = scoringEngine.deriveRating(score);
-
-        ComplianceScore cs = new ComplianceScore();
-        cs.setVendor(vendor);
-        cs.setScore(score);
-        cs.setRating(rating);
-
-        return complianceScoreRepository.save(cs);
-    }
+            List<DocumentType> requiredTypes,
+            List<VendorDocument> uploadedDocuments);
 }
