@@ -1,11 +1,16 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.model.DocumentType;
+import com.example.demo.model.Vendor;
 import com.example.demo.model.VendorDocument;
-import com.example.demo.repository.VendorDocumentRepository;
 import com.example.demo.repository.DocumentTypeRepository;
+import com.example.demo.repository.VendorDocumentRepository;
 import com.example.demo.repository.VendorRepository;
 import com.example.demo.service.VendorDocumentService;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class VendorDocumentServiceImpl implements VendorDocumentService {
 
@@ -13,6 +18,7 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
     private final VendorRepository vendorRepository;
     private final DocumentTypeRepository documentTypeRepository;
 
+    // ⚠️ Constructor order REQUIRED
     public VendorDocumentServiceImpl(
             VendorDocumentRepository vendorDocumentRepository,
             VendorRepository vendorRepository,
@@ -26,22 +32,38 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
     @Override
     public VendorDocument uploadDocument(Long vendorId, Long typeId, VendorDocument document) {
 
-        document.setVendor(
-                vendorRepository.findById(vendorId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Vendor not found"))
-        );
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Vendor not found"));
 
-        document.setDocumentType(
-                documentTypeRepository.findById(typeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Document type not found"))
+        DocumentType type = documentTypeRepository.findById(typeId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("DocumentType not found"));
+
+        if (document.getExpiryDate() != null &&
+                document.getExpiryDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Expiry date cannot be in the past");
+        }
+
+        document.setVendor(vendor);
+        document.setDocumentType(type);
+        document.setIsValid(
+                document.getExpiryDate() == null ||
+                        document.getExpiryDate().isAfter(LocalDate.now())
         );
 
         return vendorDocumentRepository.save(document);
     }
 
     @Override
+    public List<VendorDocument> getDocumentsForVendor(Long vendorId) {
+        return vendorDocumentRepository.findByVendorId(vendorId);
+    }
+
+    @Override
     public VendorDocument getDocument(Long id) {
         return vendorDocumentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("VendorDocument not found"));
     }
 }
