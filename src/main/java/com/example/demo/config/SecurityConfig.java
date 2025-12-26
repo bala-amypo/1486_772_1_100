@@ -1,8 +1,8 @@
 package com.example.demo.config;
 
 import com.example.demo.security.JwtAuthenticationFilter;
+import com.example.demo.security.JwtUtil;
 import com.example.demo.security.CustomUserDetailsService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,9 +27,16 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // ✅ ADD THIS BEAN
+    @Bean
+    public JwtUtil jwtUtil() {
+        String secret = "mySecretKey123456789012345678901234567890";
+        long expiration = 86400000L; // 24 hours in milliseconds
+        return new JwtUtil(secret, expiration);
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session ->
