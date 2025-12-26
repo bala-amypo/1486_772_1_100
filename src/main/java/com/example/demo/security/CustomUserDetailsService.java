@@ -3,7 +3,7 @@ package com.example.demo.security;
 import com.example.demo.repository.UserRepository;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
-import com.example.demo.entity.User;
+import com.example.demo.model.User;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
