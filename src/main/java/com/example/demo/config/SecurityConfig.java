@@ -20,17 +20,20 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
+    // ✅ REMOVE JwtAuthenticationFilter from constructor
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
+    // ✅ CREATE JwtUtil bean
     @Bean
     public JwtUtil jwtUtil() {
         String secret = "mySecretKey123456789012345678901234567890";
-        long expiration = 86400000L;
+        long expiration = 86400000L; // 24 hours in milliseconds
         return new JwtUtil(secret, expiration);
     }
 
+    // ✅ CREATE JwtAuthenticationFilter bean
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtUtil(), userDetailsService);
@@ -49,12 +52,12 @@ public class SecurityConfig {
                         "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
-                .anyRequest().authenticated()   // ✅ FIXED
+                .anyRequest().permitAll()
             );
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(
-                jwtAuthenticationFilter(),
+                jwtAuthenticationFilter(), // ✅ Use the bean method
                 UsernamePasswordAuthenticationFilter.class
         );
 
@@ -68,7 +71,8 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
