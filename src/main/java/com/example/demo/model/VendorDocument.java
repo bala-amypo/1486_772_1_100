@@ -2,7 +2,6 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 public class VendorDocument {
@@ -19,18 +18,11 @@ public class VendorDocument {
 
     private String fileUrl;
 
-    // ✅ REQUIRED FIELD
     private LocalDate expiryDate;
 
     private boolean valid;
 
-    private LocalDateTime uploadedAt;
-
-    public VendorDocument() {}
-
-    // =====================
-    // GETTERS & SETTERS
-    // =====================
+    /* ---------------- GETTERS & SETTERS ---------------- */
 
     public Long getId() {
         return id;
@@ -60,7 +52,6 @@ public class VendorDocument {
         this.fileUrl = fileUrl;
     }
 
-    // 🔥 THIS METHOD WAS MISSING
     public LocalDate getExpiryDate() {
         return expiryDate;
     }
@@ -77,14 +68,16 @@ public class VendorDocument {
         this.valid = valid;
     }
 
-    public LocalDateTime getUploadedAt() {
-        return uploadedAt;
+    // ✅ REQUIRED BY TESTS + ComplianceScoringEngine
+    public Boolean getIsValid() {
+        return valid;
     }
 
-    // REQUIRED BY TESTS
+    // ✅ REQUIRED BY TESTS
+    @PrePersist
     public void prePersist() {
-        if (this.uploadedAt == null) {
-            this.uploadedAt = LocalDateTime.now();
+        if (expiryDate != null && expiryDate.isBefore(LocalDate.now())) {
+            this.valid = false;
         }
     }
 }
