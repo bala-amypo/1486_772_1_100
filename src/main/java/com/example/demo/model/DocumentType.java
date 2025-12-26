@@ -1,59 +1,40 @@
 package com.example.demo.model;
 
+import com.example.demo.exception.ValidationException;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "document_types", uniqueConstraints = @UniqueConstraint(columnNames = "typeName"))
+@Table(name = "document_types")
 public class DocumentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String typeName;
-    private String description;
-    private Boolean required;
-    private Integer weight;
-    private LocalDateTime createdAt;
+
+    private String name;
+    private boolean required;
+    private double weight;
 
     @ManyToMany(mappedBy = "supportedDocumentTypes")
     private Set<Vendor> vendors = new HashSet<>();
 
-    public DocumentType() {}
-
-    public DocumentType(String typeName, String description, Boolean required, Integer weight) {
-        this.typeName = typeName;
-        this.description = description;
-        this.required = required;
-        this.weight = weight;
-    }
-
     @PrePersist
-    protected void onCreate() {
-        if (weight == null) weight = 0;
-        createdAt = LocalDateTime.now();
+    public void prePersist() {
+        if (weight <= 0) {
+            throw new ValidationException("Weight must be positive");
+        }
     }
 
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getTypeName() { return typeName; }
-    public void setTypeName(String typeName) { this.typeName = typeName; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public Boolean getRequired() { return required; }
-    public void setRequired(Boolean required) { this.required = required; }
-
-    public Integer getWeight() { return weight; }
-    public void setWeight(Integer weight) { this.weight = weight; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
+    public String getName() { return name; }
+    public boolean isRequired() { return required; }
+    public double getWeight() { return weight; }
     public Set<Vendor> getVendors() { return vendors; }
-    public void setVendors(Set<Vendor> vendors) { this.vendors = vendors; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setRequired(boolean required) { this.required = required; }
+    public void setWeight(double weight) { this.weight = weight; }
 }
