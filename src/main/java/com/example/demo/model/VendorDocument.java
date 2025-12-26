@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "vendor_documents")
 public class VendorDocument {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,7 +26,7 @@ public class VendorDocument {
     public VendorDocument() {}
 
     @PrePersist
-    void prePersist() {
+    public void prePersist() {  // ✅ Changed to PUBLIC
         uploadedAt = LocalDateTime.now();
     }
 
