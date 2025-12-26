@@ -3,42 +3,52 @@ package com.example.demo.dto;
 public class AuthResponse {
 
     private String token;
+    private Long userId;
     private String email;
     private String role;
-    private Long userId;
 
-    // ✅ REQUIRED
-    public AuthResponse() {}
+    // No-arg constructor
+    public AuthResponse() {
+    }
 
-    // ✅ REQUIRED BY TEST (4-ARG CONSTRUCTOR)
-    public AuthResponse(String token, long userId, String email, String role) {
+    // REQUIRED constructor (used in tests)
+    public AuthResponse(String token, Long userId, String email, String role) {
         this.token = token;
         this.userId = userId;
         this.email = email;
         this.role = role;
     }
 
-    // ✅ REQUIRED (OLDER CONSTRUCTOR)
-    public AuthResponse(String token, String email, String role) {
-        this.token = token;
-        this.email = email;
-        this.role = role;
-    }
-
-    // ✅ REQUIRED GETTERS (TEST USES THESE)
+    // Getters & Setters
     public String getToken() {
         return token;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRole() {
-        return role;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Long getUserId() {
         return userId;
+    }
+ 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+ 
+    public String getEmail() {
+        return email;
+    }
+ 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+ 
+    public String getRole() {
+        return role;
+    }
+ 
+    public void setRole(String role) {
+        this.role = role;
     }
 }
