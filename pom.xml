@@ -22,7 +22,7 @@
 
     <dependencies>
 
-        <!-- ================= SPRING ================= -->
+        <!-- ================= SPRING CORE ================= -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -39,6 +39,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
             <version>${spring.boot.version}</version>
+        </dependency>
+
+        <!-- ================= SWAGGER / OPENAPI ================= -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
         </dependency>
 
         <!-- ================= JAKARTA SERVLET ================= -->
@@ -91,7 +98,7 @@
     <build>
         <plugins>
 
-            <!-- COMPILER -->
+            <!-- ================= COMPILER ================= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -102,7 +109,7 @@
                 </configuration>
             </plugin>
 
-            <!-- TESTNG -->
+            <!-- ================= TESTNG ================= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
