@@ -1,41 +1,67 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "document_types")
 public class DocumentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Column(unique = true)
+    private String typeName;
 
-    private boolean required;
+    private String description;
+    private Boolean required;
+    private Integer weight;
+    private LocalDateTime createdAt;
 
-    // ===== Getters & Setters =====
+    @ManyToMany(mappedBy = "supportedDocumentTypes")
+    private Set<Vendor> vendors = new HashSet<>();
 
-    public Long getId() {
-        return id;
+    public DocumentType() {}
+
+    @PrePersist
+    void prePersist() {
+        createdAt = LocalDateTime.now();
     }
- 
-    public void setId(Long id) {
-        this.id = id;
+
+    // getters & setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTypeName() { return typeName; }
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
- 
-    public String getName() {
-        return name;
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) {
+        this.description = description;
     }
- 
-    public void setName(String name) {
-        this.name = name;
-    }
- 
-    public boolean isRequired() {
-        return required;
-    }
- 
-    public void setRequired(boolean required) {
+
+    public Boolean getRequired() { return required; }
+    public void setRequired(Boolean required) {
         this.required = required;
+    }
+
+    public Integer getWeight() { return weight; }
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Set<Vendor> getVendors() { return vendors; }
+    public void setVendors(Set<Vendor> vendors) {
+        this.vendors = vendors;
     }
 }
