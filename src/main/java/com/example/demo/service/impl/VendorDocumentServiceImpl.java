@@ -17,45 +17,45 @@ import java.util.List;
 public class VendorDocumentServiceImpl implements VendorDocumentService {
 
     private final VendorRepository vendorRepository;
-    private final DocumentTypeRepository typeRepository;
-    private final VendorDocumentRepository documentRepository;
+    private final DocumentTypeRepository documentTypeRepository;
+    private final VendorDocumentRepository vendorDocumentRepository;
 
-    public VendorDocumentServiceImpl(
-            VendorRepository vendorRepository,
-            DocumentTypeRepository typeRepository,
-            VendorDocumentRepository documentRepository) {
-
+    public VendorDocumentServiceImpl(VendorRepository vendorRepository,
+                                     DocumentTypeRepository documentTypeRepository,
+                                     VendorDocumentRepository vendorDocumentRepository) {
         this.vendorRepository = vendorRepository;
-        this.typeRepository = typeRepository;
-        this.documentRepository = documentRepository;
+        this.documentTypeRepository = documentTypeRepository;
+        this.vendorDocumentRepository = vendorDocumentRepository;
     }
 
     @Override
-    public VendorDocument uploadDocument(
-            Long vendorId,
-            Long typeId,
-            VendorDocument document) {
+    public VendorDocument uploadDocument(Long vendorId, Long typeId, VendorDocument document) {
 
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new ValidationException("Vendor not found"));
 
-        DocumentType type = typeRepository.findById(typeId)
-                .orElseThrow(() -> new ValidationException("DocumentType not found"));
+        DocumentType type = documentTypeRepository.findById(typeId)
+                .orElseThrow(() -> new ValidationException("Document type not found"));
+
+        if (document.getExpiryDate() != null &&
+            document.getExpiryDate().isBefore(LocalDate.now())) {
+            throw new ValidationException("Document expired");
+        }
 
         document.setVendor(vendor);
         document.setDocumentType(type);
 
-        return documentRepository.save(document);
+        return vendorDocumentRepository.save(document);
     }
 
     @Override
     public VendorDocument getDocument(Long id) {
-        return documentRepository.findById(id)
+        return vendorDocumentRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Document not found"));
     }
 
     @Override
     public List<VendorDocument> getExpiredDocuments() {
-        return documentRepository.findByExpiryDateBefore(LocalDate.now());
+        return vendorDocumentRepository.findByExpiryDateBefore(LocalDate.now());
     }
 }
