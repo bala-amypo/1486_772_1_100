@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface DocumentTypeRepository extends JpaRepository<DocumentType, Long> {
 
+    boolean existsByTypeName(String typeName);
+
     List<DocumentType> findByRequiredTrue();
 }
