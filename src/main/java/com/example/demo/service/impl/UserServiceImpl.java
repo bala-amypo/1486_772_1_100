@@ -15,12 +15,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(User user) {
-
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
-
+    public User register(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public User getById(Long id) {   // 🔥 THIS WAS MISSING
+        return userRepository.findById(id).orElse(null);
     }
 }
