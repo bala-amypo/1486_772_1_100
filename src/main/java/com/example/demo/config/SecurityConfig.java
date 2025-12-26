@@ -3,6 +3,7 @@ package com.example.demo.config;
 import com.example.demo.security.JwtAuthenticationFilter;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.security.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +21,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -28,15 +28,19 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
+
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
     @Bean
     public JwtUtil jwtUtil() {
-        String secret = "mySecretKey123456789012345678901234567890";
-        long expiration = 86400000L; // 24 hours
-        return new JwtUtil(secret, expiration);
+        return new JwtUtil(jwtSecret, jwtExpiration);
     }
 
     @Bean
@@ -67,8 +71,10 @@ public class SecurityConfig {
                         "/v3/api-docs/**",
                         "/swagger-resources/**",
                         "/webjars/**",
+                        "/configuration/**",
                         "/health",
-                        "/actuator/**"
+                        "/actuator/**",
+                        "/error"
                 ).permitAll()
                 
                 // API endpoints - require authentication
@@ -110,6 +116,9 @@ public class SecurityConfig {
         
         // Expose Authorization header
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        
+        // Max age for preflight requests
+        configuration.setMaxAge(3600L);
         
         // Apply CORS configuration to all paths
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
