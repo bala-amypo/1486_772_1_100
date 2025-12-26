@@ -33,10 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // ✅ IMPORTANT: Skip authentication for auth & swagger endpoints
+        // ✅ Skip JWT processing for public endpoints
         if (path.startsWith("/auth/")
                 || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")) {
+                || path.startsWith("/v3/api-docs")
+                || path.equals("/error")) {
 
             filterChain.doFilter(request, response);
             return;
@@ -44,7 +45,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // ✅ If no token → continue (Spring Security will decide)
+        // ✅ IMPORTANT FIX:
+        // If no JWT token, DO NOT BLOCK the request
+        // Let Spring Security handle it (will return 401 if needed)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -56,7 +59,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtUtil.extractUsername(token);
         } catch (Exception e) {
-            filterChain.doFilter(request, response);
+            // ❌ Invalid token → 401
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid JWT token");
             return;
         }
 
@@ -66,22 +71,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(token, username)) {
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
-
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+            if (!jwtUtil.validateToken(token, username)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Expired or invalid JWT token");
+                return;
             }
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource()
+                            .buildDetails(request));
+
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
