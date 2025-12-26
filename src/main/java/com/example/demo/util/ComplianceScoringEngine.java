@@ -2,41 +2,33 @@ package com.example.demo.util;
 
 import com.example.demo.model.DocumentType;
 import com.example.demo.model.VendorDocument;
-
 import java.util.List;
 
 public class ComplianceScoringEngine {
 
-    // ✅ INSTANCE METHOD (NOT static)
-    public double calculateScore(
-            List<DocumentType> documentTypes,
-            List<VendorDocument> vendorDocuments) {
+    public static double calculateScore(
+            List<DocumentType> required,
+            List<VendorDocument> uploaded) {
 
-        int totalWeight = 0;
-        int achievedWeight = 0;
-
-        for (DocumentType type : documentTypes) {
-            totalWeight += type.getWeight();
-
-            boolean validPresent = vendorDocuments.stream()
-                    .anyMatch(d ->
-                            d.getDocumentType().getId().equals(type.getId()) &&
-                            Boolean.TRUE.equals(d.getIsValid())
-                    );
-
-            if (validPresent) {
-                achievedWeight += type.getWeight();
-            }
+        if (required.isEmpty()) {
+            return 100.0;
         }
 
-        return totalWeight == 0 ? 0 : (achievedWeight * 100.0) / totalWeight;
+        long matched = required.stream()
+            .filter(r ->
+                uploaded.stream()
+                    .anyMatch(v ->
+                        v.getDocumentType().equals(r)
+                    )
+            ).count();
+
+        return (matched * 100.0) / required.size();
     }
 
-    // ✅ REQUIRED BY TESTS
-    public String deriveRating(double score) {
-        if (score >= 80) return "EXCELLENT";
-        if (score >= 60) return "GOOD";
-        if (score >= 40) return "AVERAGE";
+    public static String rating(double score) {
+        if (score >= 90) return "EXCELLENT";
+        if (score >= 75) return "GOOD";
+        if (score >= 50) return "AVERAGE";
         return "POOR";
     }
 }
