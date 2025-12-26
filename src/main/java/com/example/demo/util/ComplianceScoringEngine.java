@@ -7,7 +7,8 @@ import java.util.List;
 
 public class ComplianceScoringEngine {
 
-    public static double calculateScore(
+    // ✅ INSTANCE METHOD (NOT static)
+    public double calculateScore(
             List<DocumentType> documentTypes,
             List<VendorDocument> vendorDocuments) {
 
@@ -17,17 +18,25 @@ public class ComplianceScoringEngine {
         for (DocumentType type : documentTypes) {
             totalWeight += type.getWeight();
 
-            boolean validDocPresent = vendorDocuments.stream()
+            boolean validPresent = vendorDocuments.stream()
                     .anyMatch(d ->
                             d.getDocumentType().getId().equals(type.getId()) &&
                             Boolean.TRUE.equals(d.getIsValid())
                     );
 
-            if (validDocPresent) {
+            if (validPresent) {
                 achievedWeight += type.getWeight();
             }
         }
 
         return totalWeight == 0 ? 0 : (achievedWeight * 100.0) / totalWeight;
+    }
+
+    // ✅ REQUIRED BY TESTS
+    public String deriveRating(double score) {
+        if (score >= 80) return "EXCELLENT";
+        if (score >= 60) return "GOOD";
+        if (score >= 40) return "AVERAGE";
+        return "POOR";
     }
 }
