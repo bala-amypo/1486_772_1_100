@@ -3,47 +3,26 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "compliance_scores")
 public class ComplianceScore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private Vendor vendor;
 
     private double score;
-
     private String rating;
 
-    // ---------- GETTERS & SETTERS ----------
+    public Long getId() { return id; }
+    public Vendor getVendor() { return vendor; }
+    public double getScore() { return score; }
+    public String getRating() { return rating; }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    // ✅ THIS WAS MISSING
-    public void setScore(double score) {
-        this.score = score;
-    }
-
-    public String getRating() {
-        return rating;
-    }
-
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
+    public void setId(Long id) { this.id = id; }
+    public void setVendor(Vendor vendor) { this.vendor = vendor; }
+    public void setScore(double score) { this.score = score; }
+    public void setRating(String rating) { this.rating = rating; }
 }
