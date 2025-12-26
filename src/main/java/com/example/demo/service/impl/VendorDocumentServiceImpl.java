@@ -17,7 +17,7 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
         this.vendorDocumentRepository = vendorDocumentRepository;
     }
 
-    // ✅ SIGNATURE MUST MATCH INTERFACE EXACTLY
+    // ✅ MUST MATCH INTERFACE EXACTLY
     @Override
     public VendorDocument uploadDocument(VendorDocument document) {
 
