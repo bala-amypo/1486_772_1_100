@@ -4,7 +4,7 @@ import com.example.demo.model.ComplianceScore;
 
 public interface ComplianceScoreService {
 
-    ComplianceScore calculateScore(Long vendorId);
+    ComplianceScore evaluateVendor(Long vendorId);
 
     ComplianceScore getScore(Long vendorId);
 }
