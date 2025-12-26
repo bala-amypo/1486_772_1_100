@@ -1,12 +1,56 @@
-package com.example.demo.service;
+package com.example.demo.model;
 
-import com.example.demo.model.User;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
-public interface UserService {
+@Entity
+@Table(
+    name = "users",
+    uniqueConstraints = @UniqueConstraint(columnNames = "email")
+)
+public class User {
 
-    User registerUser(User user);
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    User findByEmail(String email);
+    private String fullName;
 
-    User getById(Long id);
+    @Column(unique = true)
+    private String email;
+
+    private String password;
+    private String role;
+    private LocalDateTime createdAt;
+
+    public User() {}
+
+    @PrePersist
+    void prePersist() {
+        createdAt = LocalDateTime.now();
+        if (role == null) {
+            role = "USER";
+        }
+    }
+
+    // getters & setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
