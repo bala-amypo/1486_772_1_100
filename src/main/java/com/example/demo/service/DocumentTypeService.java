@@ -1,5 +1,13 @@
 package com.example.demo.service;
 
+import com.example.demo.model.DocumentType;
+import java.util.List;
+
 public interface DocumentTypeService {
-    // No methods required by test cases
+
+    DocumentType createDocumentType(DocumentType type);
+
+    List<DocumentType> getAllDocumentTypes();
+
+    DocumentType getDocumentType(Long id);
 }
