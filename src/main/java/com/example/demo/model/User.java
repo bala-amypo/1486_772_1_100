@@ -1,36 +1,41 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "users",
-    uniqueConstraints = @UniqueConstraint(columnNames = "email")
-)
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     private String fullName;
-
-    @Column(unique = true)
     private String email;
-
     private String password;
     private String role;
-    private LocalDateTime createdAt;
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public User() {}
 
+    public User(Long id, String fullName, String email, String password, String role) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
     @PrePersist
-    void prePersist() {
-        createdAt = LocalDateTime.now();
-        if (role == null) {
-            role = "USER";
-        }
+    public void prePersist() {
+        if (role == null) role = "MONITOR";
     }
 
     // getters & setters
@@ -48,9 +53,4 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
