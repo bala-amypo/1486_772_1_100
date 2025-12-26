@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface VendorDocumentRepository
-        extends JpaRepository<VendorDocument, Long> {
+public interface VendorDocumentRepository extends JpaRepository<VendorDocument, Long> {
 
     List<VendorDocument> findByExpiryDateBefore(LocalDate date);
 }
