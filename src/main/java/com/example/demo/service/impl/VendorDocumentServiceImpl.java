@@ -17,10 +17,11 @@ public class VendorDocumentServiceImpl implements VendorDocumentService {
         this.vendorDocumentRepository = vendorDocumentRepository;
     }
 
+    // ✅ SIGNATURE MUST MATCH INTERFACE EXACTLY
     @Override
     public VendorDocument uploadDocument(VendorDocument document) {
 
-        if (document.getFileUrl() == null || document.getFileUrl().isEmpty()) {
+        if (document.getFileUrl() == null || document.getFileUrl().isBlank()) {
             throw new ValidationException("File URL is required");
         }
 
