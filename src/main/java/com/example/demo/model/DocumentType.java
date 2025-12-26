@@ -1,7 +1,7 @@
 package com.example.demo.model;
 
-import com.example.demo.exception.ValidationException;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,19 +14,24 @@ public class DocumentType {
     private Long id;
 
     private String name;
+
     private boolean required;
+
     private double weight;
+
+    private LocalDateTime createdAt;
 
     @ManyToMany(mappedBy = "supportedDocumentTypes")
     private Set<Vendor> vendors = new HashSet<>();
 
     @PrePersist
     public void prePersist() {
-        if (weight <= 0) {
-            throw new ValidationException("Weight must be positive");
-        }
+        this.createdAt = LocalDateTime.now();
     }
 
+    public DocumentType() {}
+
+    // getters & setters
     public Long getId() { return id; }
     public String getName() { return name; }
     public boolean isRequired() { return required; }
