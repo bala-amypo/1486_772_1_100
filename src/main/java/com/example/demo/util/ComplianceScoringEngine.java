@@ -18,11 +18,15 @@ public class ComplianceScoringEngine {
             return 100.0;
         }
 
-        
-        if (!providedItems.isEmpty() && providedItems.get(0) instanceof VendorDocument) {
-        
-            List<VendorDocument> vendorDocuments = (List<VendorDocument>) providedItems;
-            
+        // Case 1: Vendor uploaded documents
+        if (providedItems != null &&
+            !providedItems.isEmpty() &&
+            providedItems.get(0) instanceof VendorDocument) {
+
+            @SuppressWarnings("unchecked")
+            List<VendorDocument> vendorDocuments =
+                    (List<VendorDocument>) providedItems;
+
             Set<Long> validUploadedTypeIds = vendorDocuments.stream()
                     .filter(doc ->
                             doc.getExpiryDate() == null ||
@@ -35,13 +39,17 @@ public class ComplianceScoringEngine {
                     .count();
 
             return (uploadedRequired * 100.0) / requiredTypes.size();
-            
-        } else {
-            
-            List<DocumentType> providedTypes = (List<DocumentType>) providedItems;
-            
+
+        } 
+        // Case 2: Weight-based scoring
+        else {
+
+            @SuppressWarnings("unchecked")
+            List<DocumentType> providedTypes =
+                    (List<DocumentType>) providedItems;
+
             int totalWeight = requiredTypes.stream()
-                    .mapToInt(dt -> dt.getWeight() != null ? dt.getWeight() : 0)
+                    .mapToInt(DocumentType::getWeight)
                     .sum();
 
             if (totalWeight == 0) {
@@ -49,14 +57,13 @@ public class ComplianceScoringEngine {
             }
 
             int providedWeight = providedTypes.stream()
-                    .mapToInt(dt -> dt.getWeight() != null ? dt.getWeight() : 0)
+                    .mapToInt(DocumentType::getWeight)
                     .sum();
 
             return (providedWeight * 100.0) / totalWeight;
         }
     }
 
-    
     public String deriveRating(double score) {
         if (score >= 90) {
             return "EXCELLENT";
