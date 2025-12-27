@@ -17,12 +17,8 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    // ✅ METHOD YOUR AuthController EXPECTS
-    public String generateToken(Authentication authentication,
-                                Long userId,
-                                String email,
-                                String role) {
-
+    // ✅ Method 1: Generate token with Authentication (4 parameters) - Used by AuthController
+    public String generateToken(Authentication authentication, Long userId, String email, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration);
 
@@ -36,6 +32,39 @@ public class JwtUtil {
                 .compact();
     }
 
+    // ✅ Method 2: Simple token generation (1 parameter) - Backward compatibility
+    public String generateToken(String email) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expiration);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    // ✅ Method 3: Extract username from token - Used by JwtAuthenticationFilter
+    public String extractUsername(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    // ✅ Method 4: Validate token with username (2 parameters) - Used by JwtAuthenticationFilter
+    public boolean validateToken(String token, String username) {
+        try {
+            String extractedUsername = extractUsername(token);
+            return (extractedUsername.equals(username) && !isTokenExpired(token));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // ✅ Method 5: Single-parameter validation (1 parameter) - Backward compatibility
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
@@ -45,15 +74,30 @@ public class JwtUtil {
         }
     }
 
-    public String extractUsername(String token) {
+    // ✅ Private helper: Check if token is expired
+    private boolean isTokenExpired(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getExpiration().before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    // ✅ Method 6: Extract userId from token
+    public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+        return claims.get("userId", Long.class);
     }
 
-    public String extractRole(String token) {
+    // ✅ Method 7: Extract role from token
+    public String getRoleFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
