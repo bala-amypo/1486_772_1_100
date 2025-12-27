@@ -13,14 +13,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-// ✅ REMOVE @Component annotation
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    // ✅ REMOVE @Autowired - use constructor injection instead
+
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    // ✅ ADD constructor
+    
     public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
