@@ -1,12 +1,9 @@
-package com.example.demo.config;
+package com.example.demo.security;
 
-import com.example.demo.security.JwtAuthenticationFilter;
-import com.example.demo.security.JwtUtil;
-import com.example.demo.security.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,48 +15,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
-
-    // ✅ REMOVE JwtAuthenticationFilter from constructor
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
-    // ✅ CREATE JwtUtil bean
     @Bean
-    public JwtUtil jwtUtil() {
-        String secret = "mySecretKey123456789012345678901234567890";
-        long expiration = 86400000L; // 24 hours in milliseconds
+    public JwtUtil jwtUtil(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") long expiration) {
         return new JwtUtil(secret, expiration);
     }
 
-    // ✅ CREATE JwtAuthenticationFilter bean
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil(), userDetailsService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil) {
+        return new JwtAuthenticationFilter(jwtUtil);
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtFilter) throws Exception {
+
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                        "/auth/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**"
-                ).permitAll()
-                .requestMatchers("/api/**").authenticated()
-                .anyRequest().permitAll()
-            );
-
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(
-                jwtAuthenticationFilter(), // ✅ Use the bean method
-                UsernamePasswordAuthenticationFilter.class
-        );
+                    .requestMatchers(
+                            "/auth/**",
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**"
+                    ).permitAll()
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -67,15 +52,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
     }
 
     @Bean
