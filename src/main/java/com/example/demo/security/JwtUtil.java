@@ -3,6 +3,7 @@ package com.example.demo.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.Authentication;
 
 import java.util.Date;
 
@@ -16,12 +17,18 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String generateToken(String email, String role) {
+    // ✅ METHOD YOUR AuthController EXPECTS
+    public String generateToken(Authentication authentication,
+                                Long userId,
+                                String email,
+                                String role) {
+
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .setSubject(email)
+                .claim("userId", userId)
                 .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
