@@ -12,13 +12,12 @@ public class JwtUtil {
     private final String secret;
     private final long validityInMs;
 
-    // REQUIRED constructor (tests instantiate directly)
+
     public JwtUtil(String secret, long validityInMs) {
         this.secret = secret;
         this.validityInMs = validityInMs;
     }
 
-    // ✅ REQUIRED by AuthController + tests
     public String generateToken(
             Authentication authentication,
             Long userId,
