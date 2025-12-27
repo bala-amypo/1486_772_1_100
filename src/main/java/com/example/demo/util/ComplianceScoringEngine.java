@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class ComplianceScoringEngine {
 
-    // ✅ Main method that handles BOTH cases
     public double calculateScore(
             List<DocumentType> requiredTypes,
             List<?> providedItems) {
@@ -19,9 +18,9 @@ public class ComplianceScoringEngine {
             return 100.0;
         }
 
-        // Check if the provided items are VendorDocuments or DocumentTypes
+        
         if (!providedItems.isEmpty() && providedItems.get(0) instanceof VendorDocument) {
-            // Original logic for VendorDocument list
+        
             List<VendorDocument> vendorDocuments = (List<VendorDocument>) providedItems;
             
             Set<Long> validUploadedTypeIds = vendorDocuments.stream()
@@ -38,7 +37,7 @@ public class ComplianceScoringEngine {
             return (uploadedRequired * 100.0) / requiredTypes.size();
             
         } else {
-            // New logic for DocumentType list (for the test)
+            
             List<DocumentType> providedTypes = (List<DocumentType>) providedItems;
             
             int totalWeight = requiredTypes.stream()
@@ -57,7 +56,7 @@ public class ComplianceScoringEngine {
         }
     }
 
-    // ✅ Rating method
+    
     public String deriveRating(double score) {
         if (score >= 90) {
             return "EXCELLENT";

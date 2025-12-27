@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;  // ← ADD THIS IMPORT
 
 import java.util.List;
 
-@Service  // ← ADD THIS ANNOTATION
+@Service  
 public class ComplianceRuleServiceImpl implements ComplianceRuleService {
 
     private final ComplianceRuleRepository complianceRuleRepository;

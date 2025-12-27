@@ -22,7 +22,7 @@ public class ComplianceScoreServiceImpl implements ComplianceScoreService {
 
     private final ComplianceScoringEngine scoringEngine = new ComplianceScoringEngine();
 
-    // ⚠ Constructor order MUST match tests
+    
     public ComplianceScoreServiceImpl(
             VendorRepository vendorRepository,
             DocumentTypeRepository documentTypeRepository,
