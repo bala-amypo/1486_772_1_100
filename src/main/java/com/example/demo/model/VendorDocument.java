@@ -26,7 +26,7 @@ public class VendorDocument {
     public VendorDocument() {}
 
     @PrePersist
-    public void prePersist() {  // ✅ Changed to PUBLIC
+    public void prePersist() {  
         uploadedAt = LocalDateTime.now();
     }
 

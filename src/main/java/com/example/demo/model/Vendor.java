@@ -27,7 +27,7 @@ public class Vendor {
     public Vendor() {}
 
     @PrePersist
-    public void prePersist() {  // ✅ Changed to PUBLIC
+    public void prePersist() {  
         createdAt = LocalDateTime.now();
     }
 

@@ -46,7 +46,7 @@ public class AuthController {
 
         User user = userService.findByEmail(request.getEmail());
 
-        // ✅ FIXED LINE
+        
         String token = jwtUtil.generateToken(user.getEmail());
 
         AuthResponse response = new AuthResponse(

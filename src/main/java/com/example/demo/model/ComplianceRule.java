@@ -20,7 +20,7 @@ public class ComplianceRule {
     public ComplianceRule() {}
 
     @PrePersist
-    public void prePersist() {  // ✅ Changed to PUBLIC
+    public void prePersist() {  
         createdAt = LocalDateTime.now();
         if (threshold == null) {
             threshold = 0.0;
