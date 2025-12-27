@@ -21,6 +21,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
+            "/",
+            "/error",
             "/auth/",
             "/swagger-ui",
             "/v3/api-docs",
@@ -28,8 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/webjars/",
             "/configuration/",
             "/health",
-            "/actuator/",
-            "/error"
+            "/actuator/"
     );
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
@@ -93,6 +94,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isPublicPath(String path) {
-        return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+        // Handle exact matches for root and error
+        if (path.equals("/") || path.equals("/error")) {
+            System.out.println("✅ Root or error path: " + path);
+            return true;
+        }
+        
+        // Check if path starts with any public path
+        boolean isPublic = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+        if (isPublic) {
+            System.out.println("✅ Path '" + path + "' matches public pattern");
+        }
+        return isPublic;
     }
 }
