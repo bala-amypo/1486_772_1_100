@@ -7,11 +7,11 @@ public class AuthResponse {
     private String email;
     private String role;
 
-    // No-arg constructor
+
     public AuthResponse() {
     }
 
-    // REQUIRED constructor (used in tests)
+    
     public AuthResponse(String token, Long userId, String email, String role) {
         this.token = token;
         this.userId = userId;
@@ -19,7 +19,7 @@ public class AuthResponse {
         this.role = role;
     }
 
-    // Getters & Setters
+    
     public String getToken() {
         return token;
     }
