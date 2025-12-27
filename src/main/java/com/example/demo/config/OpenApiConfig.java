@@ -18,12 +18,12 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
 
-                // ✅ KEEPING YOUR SERVER CONFIG EXACTLY
+                
                 .servers(List.of(
                         new Server().url("https://9010.pro604cr.amypo.ai/")
                 ))
 
-                // ✅ ADDING JWT SECURITY (REQUIRED)
+                
                 .addSecurityItem(
                         new SecurityRequirement().addList("bearerAuth")
                 )

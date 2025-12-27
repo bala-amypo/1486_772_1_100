@@ -19,9 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // ===============================
-    // JWT UTIL
-    // ===============================
+ 
     @Bean
     public JwtUtil jwtUtil(
             @Value("${jwt.secret}") String secret,
@@ -30,25 +28,17 @@ public class SecurityConfig {
         return new JwtUtil(secret, expiration);
     }
 
-    // ===============================
-    // PASSWORD ENCODER
-    // ===============================
+   
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ===============================
-    // JWT FILTER
-    // ===============================
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil) {
         return new JwtAuthenticationFilter(jwtUtil);
     }
 
-    // ===============================
-    // SECURITY FILTER CHAIN
-    // ===============================
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -60,25 +50,22 @@ public class SecurityConfig {
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    // 🔓 PUBLIC ENDPOINTS
+                  
                     .requestMatchers(
                             "/auth/**",
                             "/swagger-ui/**",
                             "/v3/api-docs/**"
                     ).permitAll()
 
-                    // 🔒 EVERYTHING ELSE
+                 
                     .anyRequest().authenticated()
             )
-            // 🔥 JWT FILTER
+           
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ===============================
-    // AUTHENTICATION MANAGER
-    // ===============================
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
