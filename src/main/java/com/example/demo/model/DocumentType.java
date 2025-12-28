@@ -26,7 +26,7 @@ public class DocumentType {
 
     private LocalDateTime createdAt;
 
-    // Prevent infinite JSON loop
+    
     @JsonIgnore
     @ManyToMany(mappedBy = "supportedDocumentTypes")
     private Set<Vendor> vendors = new HashSet<>();
