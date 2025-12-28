@@ -21,12 +21,12 @@ public class DocumentType {
 
     private Boolean required;
 
-    // 🔴 MUST be Integer (not int)
+    
     private Integer weight;
 
     private LocalDateTime createdAt;
 
-    // 🔴 Prevent infinite JSON loop
+    // Prevent infinite JSON loop
     @JsonIgnore
     @ManyToMany(mappedBy = "supportedDocumentTypes")
     private Set<Vendor> vendors = new HashSet<>();
@@ -38,7 +38,7 @@ public class DocumentType {
         createdAt = LocalDateTime.now();
     }
 
-    // Getters & Setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
