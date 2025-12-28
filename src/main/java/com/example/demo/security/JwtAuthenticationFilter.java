@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String username = jwtUtil.extractUsername(token);
                     String role = jwtUtil.extractRole(token);
                     
-                    // Create authority with ROLE_ prefix (Spring Security convention)
+                
                     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
                     
                     UsernamePasswordAuthenticationToken authentication =
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (Exception e) {
-                // Log the error if needed
+                
                 System.err.println("JWT Authentication failed: " + e.getMessage());
             }
         }
