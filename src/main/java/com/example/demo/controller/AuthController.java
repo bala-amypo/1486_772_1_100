@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")  // ✅ Enable CORS for this controller
+@CrossOrigin(origins = "*")  
 public class AuthController {
 
     private final UserService userService;
@@ -46,10 +46,9 @@ public class AuthController {
                 )
         );
 
-        // Get user details
+        
         User user = userService.findByEmail(request.getEmail());
 
-        // ✅ FIXED: Generate token with all required parameters
         String token = jwtUtil.generateToken(
                 authentication,
                 user.getId(),
@@ -57,7 +56,7 @@ public class AuthController {
                 user.getRole()
         );
 
-        // Create response
+        
         AuthResponse response = new AuthResponse(
                 token,
                 user.getId(),
